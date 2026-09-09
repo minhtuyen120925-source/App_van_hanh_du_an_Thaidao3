@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light" data-tone="bh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Tính PP Thực Chi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  html{color-scheme: light dark;}
+  body{margin:0;}
+  :root{
+    --bg:#F5F2EA;
+    --surface:#FFFFFF;
+    --surface-2:#EEE8DA;
+    --border:#DCD3BE;
+    --border-soft:#E9E2D2;
+    --ink:#20303A;
+    --ink-soft:#5C6B72;
+    --ink-faint:#8B968E;
+    --accent:#2B5C8A;
+    --accent-soft:#E3EDF6;
+    --accent-ink:#1B4467;
+    --stamp:#8A6D3B;
+    --good:#1F7A4D;
+    --good-soft:#E2F2E9;
+    --bad:#B4362E;
+    --bad-soft:#FBEAE7;
+    --warn:#9C6B08;
+    --warn-soft:#FBF0D8;
+    --missing:#8E3B6B;
+    --missing-soft:#F7E7EF;
+    --shadow: 0 1px 2px rgba(32,48,58,.06), 0 8px 24px -12px rgba(32,48,58,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#181D21;
+      --surface:#20262B;
+      --surface-2:#262D33;
+      --border:#38424A;
+      --border-soft:#2C343A;
+      --ink:#E8ECEE;
+      --ink-soft:#AAB4BA;
+      --ink-faint:#78838A;
+      --accent:#6FA8D8;
+      --accent-soft:#20313F;
+      --accent-ink:#BFDCF3;
+      --stamp:#CBA562;
+      --good:#4CC98C;
+      --good-soft:#173428;
+      --bad:#E2766D;
+      --bad-soft:#3B211F;
+      --warn:#D9AC4C;
+      --warn-soft:#3A2E14;
+      --missing:#D888B4;
+      --missing-soft:#3A2432;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#181D21;
+    --surface:#20262B;
+    --surface-2:#262D33;
+    --border:#38424A;
+    --border-soft:#2C343A;
+    --ink:#E8ECEE;
+    --ink-soft:#AAB4BA;
+    --ink-faint:#78838A;
+    --accent:#6FA8D8;
+    --accent-soft:#20313F;
+    --accent-ink:#BFDCF3;
+    --stamp:#CBA562;
+    --good:#4CC98C;
+    --good-soft:#173428;
+    --bad:#E2766D;
+    --bad-soft:#3B211F;
+    --warn:#D9AC4C;
+    --warn-soft:#3A2E14;
+    --missing:#D888B4;
+    --missing-soft:#3A2432;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:28px 20px 80px;}
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:20px;
+    padding-bottom:20px; margin-bottom:18px; border-bottom:1px solid var(--border);
+  }
+  .htitle{max-width:560px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace; font-size:11.5px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent-ink); font-weight:500;
+  }
+  h1{font-size:26px; margin:6px 0 8px; text-wrap:balance; letter-spacing:-.01em;}
+  .hsub{color:var(--ink-soft); font-size:13.5px; max-width:52ch;}
+  .stamp{
+    flex:none; width:104px; height:104px; border-radius:50%;
+    border:2px dashed var(--stamp); color:var(--stamp);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:"IBM Plex Mono", monospace; font-size:10.5px; font-weight:600;
+    letter-spacing:.03em; line-height:1.35; transform:rotate(-6deg); padding:8px;
+    opacity:.85;
+  }
+
+  /* ---------- Summary bar ---------- */
+  .summary{
+    position:sticky; top:12px; z-index:5;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:16px; box-shadow:var(--shadow); margin-bottom:26px;
+  }
+  .stat{padding:4px 14px; border-left:1px solid var(--border-soft);}
+  .stat:first-child{border-left:none;}
+  .stat-label{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-faint); font-weight:600;}
+  .stat-value{
+    font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;
+    font-size:20px; font-weight:600; margin-top:4px; white-space:nowrap;
+  }
+  .stat-value.accent{color:var(--accent-ink);}
+  .stat.result .stat-value{font-size:22px;}
+  .stat.result.good .stat-value{color:var(--good);}
+  .stat.result.bad .stat-value{color:var(--bad);}
+  .stat-tag{
+    display:inline-block; margin-top:5px; font-size:10.5px; font-weight:600;
+    padding:2px 7px; border-radius:99px; letter-spacing:.03em;
+  }
+  .stat.result.good .stat-tag{background:var(--good-soft); color:var(--good);}
+  .stat.result.bad .stat-tag{background:var(--bad-soft); color:var(--bad);}
+  @media (max-width:640px){
+    .summary{grid-template-columns:1fr; position:static;}
+    .stat{border-left:none; border-top:1px solid var(--border-soft); padding-top:10px;}
+    .stat:first-child{border-top:none; padding-top:4px;}
+  }
+
+  /* ---------- Section ---------- */
+  section.group{margin-bottom:22px;}
+  .group-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    padding:0 2px 10px;
+  }
+  .group-title{font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink);}
+  .group-total{
+    font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;
+    font-size:14px; color:var(--ink-soft); font-weight:500;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden;
+  }
+  .row{
+    display:grid; grid-template-columns:1fr 190px; gap:16px; align-items:center;
+    padding:14px 16px; border-bottom:1px solid var(--border-soft);
+  }
+  .row:last-child{border-bottom:none;}
+  .row.revenue{background:var(--accent-soft);}
+  .row-label{font-size:14px; font-weight:500;}
+  .row-note{font-size:12px; color:var(--ink-soft); margin-top:3px; max-width:56ch;}
+  .badge{
+    display:inline-block; font-size:10px; font-weight:700; letter-spacing:.03em;
+    text-transform:uppercase; padding:2px 7px; border-radius:5px; margin-top:5px;
+  }
+  .badge.real{background:var(--good-soft); color:var(--good);}
+  .badge.estimate{background:var(--warn-soft); color:var(--warn);}
+  .badge.missing{background:var(--missing-soft); color:var(--missing);}
+  .badge.optional{background:var(--surface-2); color:var(--ink-soft);}
+  .input-wrap{position:relative; text-align:right;}
+  input.amt{
+    width:100%; text-align:right; font-family:"IBM Plex Mono", monospace;
+    font-variant-numeric:tabular-nums; font-size:14.5px; font-weight:500;
+    color:var(--ink); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:8px; padding:9px 26px 9px 10px;
+  }
+  input.amt:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  .unit{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    font-size:11.5px; color:var(--ink-faint); pointer-events:none;
+  }
+
+  /* ---------- Result panel ---------- */
+  .result-panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px; margin:26px 0; box-shadow:var(--shadow);
+  }
+  .formula{
+    font-family:"IBM Plex Mono", monospace; font-size:13px; color:var(--ink-soft);
+    display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; margin-bottom:16px;
+  }
+  .formula b{color:var(--ink); font-weight:600;}
+  .result-big{
+    display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  }
+  .result-big .num{
+    font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;
+    font-size:34px; font-weight:700;
+  }
+  .result-big.good .num{color:var(--good);}
+  .result-big.bad .num{color:var(--bad);}
+  .result-big .label{
+    font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    padding:5px 12px; border-radius:99px;
+  }
+  .result-big.good .label{background:var(--good-soft); color:var(--good);}
+  .result-big.bad .label{background:var(--bad-soft); color:var(--bad);}
+  .disclaimer{
+    margin-top:14px; font-size:12.5px; color:var(--warn); background:var(--warn-soft);
+    border-radius:8px; padding:10px 12px; display:flex; gap:8px;
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex; justify-content:flex-end; gap:10px; margin:-8px 0 18px;}
+  button.reset{
+    font-family:"IBM Plex Sans", sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink-soft); background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:7px 13px; cursor:pointer;
+  }
+  button.reset:hover{color:var(--ink); border-color:var(--ink-faint);}
+  button.reset:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .savenote{font-size:11.5px; color:var(--ink-faint); align-self:center;}
+
+  /* ---------- gaps / sources ---------- */
+  .gaps{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px;}
+  .gaps h2, .sources h2{font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin:0 0 12px;}
+  .gaps ol{margin:0; padding-left:20px; display:grid; gap:9px;}
+  .gaps li{font-size:13px; color:var(--ink-soft);}
+  .gaps li b{color:var(--ink); font-weight:600;}
+  .sources{margin-top:18px; font-size:12px; color:var(--ink-faint); padding:0 4px;}
+  .sources ul{margin:6px 0 0; padding-left:18px;}
+  footer{margin-top:26px; font-size:11.5px; color:var(--ink-faint); text-align:center;}
+
+  code{font-family:"IBM Plex Mono", monospace; background:var(--surface-2); padding:1px 5px; border-radius:4px; font-size:12px;}
+</style>
+<style id="bh-theme">
+/* ============ BH-THEME v1 — đồng nhất với Dashboard tổng ============ */
+:root{--bh-navy:#0f2a4a;--bh-navy2:#153b66;--bh-blue:#1e63b3;--bh-sky:#e8f1fb;--bh-bg:#f4f7fb;
+--bh-card:#fff;--bh-line:#e2e8f0;--bh-ink:#1e293b;--bh-gray:#64748b;--bh-orange:#f59e0b;
+--bh-green:#16a34a;--bh-red:#dc2626;--bh-purple:#7c3aed;--bh-teal:#0d9488;}
+html{color-scheme:light !important;}
+html,body{font-family:"Segoe UI",Roboto,Arial,sans-serif !important;font-size:14px !important;
+  line-height:1.5 !important;background:#f4f7fb !important;color:#1e293b !important;}
+*{font-family:inherit !important;text-shadow:none !important;}
+h1{font-size:20px !important;font-weight:800 !important;letter-spacing:.3px !important;}
+h2{font-size:16px !important;font-weight:700 !important;color:#0f2a4a !important;}
+h3{font-size:13.5px !important;font-weight:700 !important;color:#153b66 !important;letter-spacing:0 !important;}
+a{color:#1e63b3 !important;}
+p,li,label,span,div{letter-spacing:0 !important;}
+button{font-size:13px !important;font-weight:600 !important;border-radius:8px !important;cursor:pointer;}
+input,select,textarea{font-size:13px !important;border-radius:8px !important;background:#fff !important;
+  color:#1e293b !important;border:1px solid #e2e8f0 !important;}
+table{border-collapse:collapse !important;font-size:13px !important;font-variant-numeric:tabular-nums;}
+th{background:#0f2a4a !important;color:#fff !important;font-weight:600 !important;
+  border-color:#1c3f68 !important;}
+td{border-bottom:1px solid #e2e8f0 !important;}
+tbody tr:hover{background:#e8f1fb !important;}
+[class*="card"],[class*="panel"],[class*="box"],[id*="wrap"]{border-radius:12px !important;}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#c9d6e5;border-radius:6px}
+::-webkit-scrollbar-track{background:#eef2f7}
+.bh-hero{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;color:#fff !important;
+  border-radius:12px !important;padding:14px 20px !important;margin-bottom:18px !important;
+  box-shadow:0 2px 8px rgba(15,42,74,.18) !important;border:none !important;}
+.bh-hero h1,.bh-hero h2,.bh-hero p,.bh-hero span,.bh-hero div{color:#fff !important;}
+
+:root,:root[data-theme],:root[data-theme="dark"]{
+ --bg:#f4f7fb !important;--surface:#ffffff !important;--surface-2:#f1f5f9 !important;
+ --border:#e2e8f0 !important;--border-soft:#eef2f7 !important;
+ --ink:#1e293b !important;--ink-soft:#64748b !important;--ink-faint:#94a3b8 !important;
+ --accent:#1e63b3 !important;--accent-soft:#e8f1fb !important;--accent-ink:#0f2a4a !important;
+ --stamp:#f59e0b !important;--good:#16a34a !important;--good-soft:#dcfce7 !important;
+ --bad:#dc2626 !important;--bad-soft:#fee2e2 !important;--warn:#b45309 !important;--warn-soft:#fef3c7 !important;
+ --missing:#7c3aed !important;--missing-soft:#ede9fe !important;
+ --shadow:0 1px 4px rgba(15,42,74,.08) !important;}
+.wrap{max-width:1400px !important;}
+header{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;border-radius:12px !important;
+  padding:14px 20px !important;margin-bottom:18px !important;box-shadow:0 2px 8px rgba(15,42,74,.18) !important;}
+header *,header h1,.eyebrow,.hsub,.stamp{color:#fff !important;}
+header h1{font-size:19px !important;}
+.stamp{border-color:rgba(255,255,255,.5) !important;background:rgba(255,255,255,.12) !important;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="htitle">
+      <div class="eyebrow">Dự án Thái Đào 3 · Thay thế nhà thầu Trọng Tín</div>
+      <h1>Bảng tính Lãi/Lỗ — Phương pháp Thực Chi</h1>
+      <div class="hsub">Tính lãi/lỗ của Trọng Tín trên phần khối lượng đã thi công (đến 24.08.2026), đối chiếu doanh thu theo đơn giá hợp đồng với chi phí thực chi lấy từ chứng từ. Mọi ô số đều sửa được — số liệu ước tính sẽ tô vàng, chưa đủ dữ liệu tô hồng.</div>
+    </div>
+    <div class="stamp">PP&nbsp;THỰC&nbsp;CHI<br>VAS&nbsp;15</div>
+  </header>
+
+  <div class="toolbar">
+    <span class="savenote" id="saveNote">Tự động lưu vào trình duyệt này</span>
+    <button class="reset" id="resetBtn" type="button">↺ Đặt lại số liệu gốc</button>
+  </div>
+
+  <div class="summary">
+    <div class="stat">
+      <div class="stat-label">Doanh thu</div>
+      <div class="stat-value accent" id="sumRevenue">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Tổng chi phí</div>
+      <div class="stat-value" id="sumCost">—</div>
+    </div>
+    <div class="stat result" id="sumResultStat">
+      <div class="stat-label">Kết quả</div>
+      <div class="stat-value" id="sumResult">—</div>
+      <span class="stat-tag" id="sumTag">—</span>
+    </div>
+  </div>
+
+  <!-- DOANH THU -->
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">Doanh thu</div>
+      <div class="group-total" id="totalRevenue">—</div>
+    </div>
+    <div class="card">
+      <div class="row revenue">
+        <div>
+          <div class="row-label">Giá trị khối lượng thực tế thi công (đơn giá HĐ Bắc Hà–Trọng Tín)</div>
+          <div class="row-note">Nguồn: file sản lượng 24.08.2026, dòng Tổng cộng A+B. Trong đó đã thanh toán 8.919.343.187 đ, dở dang 8.374.940.845 đ.</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt" data-role="revenue" data-default="17294284032" value="17.294.284.032" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHI PHI TRUC TIEP -->
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">Chi phí trực tiếp</div>
+      <div class="group-total" data-group-total="truc-tiep">—</div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="row-label">Vật tư — Đất san lấp (X1)</div>
+          <div class="row-note">Nguồn: nhật ký giao nhận đất, 6.263 phiếu (07/12/2025–19/08/2026), 5 nhà cung cấp (Huy Sơn, Đại Lâm, Hưng Trí, Cao Cường, Newstar).</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="truc-tiep" data-default="10280605840" value="10.280.605.840" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Vật tư khác (Base, thép, bê tông, cống, HDPE, dầu…)</div>
+          <div class="row-note">Nguồn: THVT / Tổng hợp VT, 281 dòng nhập (04/10/2025–26/08/2026), giá <b>chưa VAT</b>. Giá có VAT tương ứng: 6.178.654.741 đ — đổi số nếu doanh thu bên trên tính theo giá có VAT.</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="truc-tiep" data-default="5663599768" value="5.663.599.768" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Nhân công + ca máy khoán 5 đội thi công (AK, GREEN, TV, NEW, AKtoNE)</div>
+          <div class="row-note">Chưa có đơn giá khoán thực tế (cột "Đơn giá thầu phụ" trong file sản lượng trống 100%). Số tạm điền = 15% giá trị sản lượng — mức tham khảo cho hạ tầng san nền/đường/cống. <b>Thay bằng số thật khi có.</b></div>
+          <span class="badge estimate">Ước tính — cần xác nhận</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="truc-tiep" data-default="2594142605" value="2.594.142.605" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Lương vận hành máy/xe cố định (lái máy + lái xe)</div>
+          <div class="row-note">Nguồn: sheet Lương công nhân, chỉ có dữ liệu Tháng 04→08/2026 (Nguyễn Sỹ Khang – lái máy, Phạm Trung Ngọc – lái xe). Thiếu các tháng trước 04/2026 nếu công trình thi công sớm hơn.</div>
+          <span class="badge real">Đã có chứng từ (thiếu vài tháng)</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="truc-tiep" data-default="141573000" value="141.573.000" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHI PHI GIAN TIEP -->
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">Chi phí gián tiếp (BCH công trường)</div>
+      <div class="group-total" data-group-total="gian-tiep">—</div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="row-label">Lương BCH / nhân viên công trường</div>
+          <div class="row-note">Nguồn: Sổ quỹ tiền mặt (THQTM), mục "Lương", 09/01/2025–26/08/2026. Gồm cả giai đoạn <b>trước ngày ký HĐ 1507 (15/07/2025)</b> — cần lọc lại đúng phạm vi và đối chiếu với Bảng đề nghị thanh toán để tránh trùng.</div>
+          <span class="badge estimate">Ước tính — cần lọc lại phạm vi</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="gian-tiep" data-default="846009100" value="846.009.100" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Thuê nhà BCH công trường</div>
+          <div class="row-note">Nguồn: Sổ quỹ tiền mặt (THQTM), mục "Tnha".</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="gian-tiep" data-default="78100000" value="78.100.000" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Điện, nước công trường</div>
+          <div class="row-note">Nguồn: Sổ quỹ tiền mặt (THQTM), mục "Dnuoc".</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="gian-tiep" data-default="29537000" value="29.537.000" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Chi phí nhân công khác (mục "CP Ncông")</div>
+          <div class="row-note">Nguồn: Sổ quỹ tiền mặt (THQTM). Chưa rõ là nhân công trực tiếp hay chi phí BCH gián tiếp — cần hỏi kế toán Trọng Tín để xếp đúng nhóm (có thể phải chuyển sang "Chi phí trực tiếp" ở trên).</div>
+          <span class="badge missing">Cần xác nhận phân loại</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="gian-tiep" data-default="175532000" value="175.532.000" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Chi phí chung khác (VPP, vận chuyển, sửa chữa, xăng xe, ăn uống công trường…)</div>
+          <div class="row-note">Nguồn: Sổ quỹ tiền mặt (THQTM), gộp các mục nhỏ còn lại (CPChung, VTPhu, Cho, VPPham, VChuyen, SChua, Xe, Internet…).</div>
+          <span class="badge real">Đã có chứng từ</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="gian-tiep" data-default="580676000" value="580.676.000" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHI PHI KHAC -->
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">Chi phí khác (tùy chọn)</div>
+      <div class="group-total" data-group-total="khac">—</div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="row-label">Chi phí tài chính / lãi vay thi công</div>
+          <div class="row-note">Chưa có thông tin Trọng Tín có vay vốn cho công trình này hay không.</div>
+          <span class="badge missing">Thiếu dữ liệu</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="khac" data-default="0" value="0" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Bảo hiểm công trình / bảo lãnh thực hiện HĐ</div>
+          <div class="row-note">Chưa xác nhận bên nào chịu chi phí này theo HĐ 1507.</div>
+          <span class="badge missing">Thiếu dữ liệu</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="khac" data-default="0" value="0" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label">Chi phí quản lý doanh nghiệp phân bổ (cấp công ty)</div>
+          <div class="row-note">Để 0 nếu chỉ so sánh lãi gộp trên công trình. Điền % hoặc số tiền nếu muốn tính lãi ròng đầy đủ.</div>
+          <span class="badge optional">Tùy chọn</span>
+        </div>
+        <div class="input-wrap">
+          <input class="amt cost" data-group="khac" data-default="0" value="0" inputmode="numeric">
+          <span class="unit">đ</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <div class="result-panel">
+    <div class="formula">
+      <span>Lãi/Lỗ&nbsp;=</span><b id="fRevenue">17.294.284.032</b>
+      <span>−</span><b id="fTrucTiep">18.679.921.213</b>
+      <span>(trực tiếp) −</span><b id="fGianTiep">1.709.854.100</b>
+      <span>(gián tiếp) −</span><b id="fKhac">0</b>
+      <span>(khác)</span>
+    </div>
+    <div class="result-big" id="resultBig">
+      <span class="num" id="resultNum">−3.095.491.281 đ</span>
+      <span class="label" id="resultLabel">LỖ (sơ bộ)</span>
+    </div>
+    <div class="disclaimer">
+      ⚠️ Kết quả trên chỉ là <b>ước tính sơ bộ</b> — 3 mục "ước tính" và "cần xác nhận" (nhân công khoán, lương BCH theo đúng thời gian, phân loại CP Ncông) chưa có số thật. Chưa dùng để kết luận hay đàm phán chính thức cho tới khi thay đủ số liệu thực.
+    </div>
+  </div>
+
+  <!-- GAPS -->
+  <div class="gaps">
+    <h2>Danh mục còn thiếu / cần làm rõ</h2>
+    <ol>
+      <li><b>Đơn giá khoán thực trả 5 đội thi công</b> (AK, GREEN, TV, NEW, AKtoNE) — khoản lớn nhất còn thiếu, hiện đang tạm ước tính 15% doanh thu.</li>
+      <li><b>Ngày bắt đầu – ngày chấm dứt thi công thực tế</b> của Trọng Tín, để lọc đúng chi phí BCH tương ứng (sổ quỹ hiện có dữ liệu từ 09/01/2025, trước cả ngày ký HĐ 15/07/2025).</li>
+      <li><b>Đối chiếu Sổ quỹ tiền mặt (THQTM)</b> với <b>Bảng đề nghị thanh toán chuyển khoản</b> (tổng 12.140.859.857 đ) để tránh trùng lặp — một số khoản (lương BCH, vật tư) có thể xuất hiện ở cả hai nguồn.</li>
+      <li><b>Phân loại mục "CP Ncông"</b> (175.532.000 đ) trong sổ quỹ — nhân công trực tiếp hay chi phí gián tiếp.</li>
+      <li><b>Chuẩn VAT thống nhất</b> — xác nhận doanh thu 17,29 tỷ và chi phí vật tư có cùng tính theo giá có/chưa VAT hay không.</li>
+      <li><b>Chi phí tài chính / lãi vay</b> của Trọng Tín cho công trình này (nếu có).</li>
+      <li><b>Bảo hiểm công trình / bảo lãnh thực hiện HĐ</b> — bên nào chịu theo HĐ 1507.</li>
+      <li><b>Khấu hao máy móc thiết bị riêng</b> của Trọng Tín (nếu tự sở hữu máy, không thuê ngoài).</li>
+      <li>Sheet "Nhà thầu Huy Sơn" trong file giao nhận đất đang <b>trống hoàn toàn</b> — xác nhận có cần bổ sung riêng hay dữ liệu đã gộp hết vào sheet "Data Đất".</li>
+    </ol>
+  </div>
+
+  <div class="sources">
+    Nguồn số liệu đã dùng — cập nhật 08.09.2026:
+    <ul>
+      <li>Doanh thu: <code>1_san_luong_Báo cáo sản lượng thi công Thái Đào 24.08.2026.xlsx</code></li>
+      <li>Vật tư đất: <code>1_vat_tu_1_THÁI ĐÀO 3 GIAO NHẬN ĐẤT.xlsx</code> (sheet Data Đất)</li>
+      <li>Vật tư khác, lương, sổ quỹ, đề nghị thanh toán: <code>2_vat_tu_2_Tổng hợp vật tư.xlsx</code> (sheet THVT / Tổng hợp VT, LƯƠNG CÔNG NHÂN, THQTM, ĐỀ NGHỊ TT)</li>
+    </ul>
+  </div>
+
+  <footer>Tài liệu tính toán nội bộ — Chú Vượng dựng theo yêu cầu Sếp Tuyền, dự án Thái Đào 3. Không phải số liệu quyết toán chính thức.</footer>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'ppthucchi-thaidao3-v1';
+  var revenueInput = document.querySelector('input[data-role="revenue"]');
+  var costInputs = Array.prototype.slice.call(document.querySelectorAll('input.cost'));
+  var allInputs = [revenueInput].concat(costInputs);
+
+  function toNumber(str){
+    if(typeof str !== 'string') return 0;
+    var cleaned = str.replace(/[^\d-]/g,'');
+    var n = parseInt(cleaned,10);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmt(n){
+    var sign = n < 0 ? '−' : '';
+    return sign + new Intl.NumberFormat('vi-VN').format(Math.abs(Math.round(n)));
+  }
+  function formatInputValue(input){
+    var n = toNumber(input.value);
+    input.value = new Intl.NumberFormat('vi-VN').format(n);
+  }
+
+  function sumGroup(group){
+    return costInputs
+      .filter(function(i){ return i.getAttribute('data-group') === group; })
+      .reduce(function(acc,i){ return acc + toNumber(i.value); }, 0);
+  }
+
+  function recalc(){
+    var revenue = toNumber(revenueInput.value);
+    var tt = sumGroup('truc-tiep');
+    var gt = sumGroup('gian-tiep');
+    var kh = sumGroup('khac');
+    var totalCost = tt + gt + kh;
+    var result = revenue - totalCost;
+
+    document.getElementById('sumRevenue').textContent = fmt(revenue) + ' đ';
+    document.getElementById('sumCost').textContent = fmt(totalCost) + ' đ';
+    document.getElementById('totalRevenue').textContent = fmt(revenue) + ' đ';
+    document.querySelector('[data-group-total="truc-tiep"]').textContent = fmt(tt) + ' đ';
+    document.querySelector('[data-group-total="gian-tiep"]').textContent = fmt(gt) + ' đ';
+    document.querySelector('[data-group-total="khac"]').textContent = fmt(kh) + ' đ';
+
+    document.getElementById('fRevenue').textContent = fmt(revenue);
+    document.getElementById('fTrucTiep').textContent = fmt(tt);
+    document.getElementById('fGianTiep').textContent = fmt(gt);
+    document.getElementById('fKhac').textContent = fmt(kh);
+
+    var resultEl = document.getElementById('sumResult');
+    var resultStat = document.getElementById('sumResultStat');
+    var tagEl = document.getElementById('sumTag');
+    var bigEl = document.getElementById('resultBig');
+    var numEl = document.getElementById('resultNum');
+    var labelEl = document.getElementById('resultLabel');
+
+    var isGood = result >= 0;
+    resultEl.textContent = fmt(result) + ' đ';
+    resultStat.classList.toggle('good', isGood);
+    resultStat.classList.toggle('bad', !isGood);
+    tagEl.textContent = isGood ? 'LÃI' : 'LỖ';
+    bigEl.classList.toggle('good', isGood);
+    bigEl.classList.toggle('bad', !isGood);
+    numEl.textContent = fmt(result) + ' đ';
+    labelEl.textContent = isGood ? 'LÃI (sơ bộ)' : 'LỖ (sơ bộ)';
+  }
+
+  function save(){
+    try{
+      var data = {};
+      allInputs.forEach(function(i, idx){ data[idx] = toNumber(i.value); });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      var note = document.getElementById('saveNote');
+      note.textContent = 'Đã lưu vào trình duyệt này';
+      clearTimeout(save._t);
+      save._t = setTimeout(function(){ note.textContent = 'Tự động lưu vào trình duyệt này'; }, 1600);
+    }catch(e){ /* localStorage unavailable, ignore */ }
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      allInputs.forEach(function(i, idx){
+        if(data[idx] !== undefined){ i.value = String(data[idx]); }
+      });
+    }catch(e){ /* ignore */ }
+  }
+
+  function resetDefaults(){
+    allInputs.forEach(function(i){
+      i.value = i.getAttribute('data-default') || '0';
+    });
+    allInputs.forEach(formatInputValue);
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    recalc();
+  }
+
+  allInputs.forEach(function(input){
+    input.addEventListener('focus', function(){
+      input.value = String(toNumber(input.value));
+    });
+    input.addEventListener('input', function(){
+      recalc();
+    });
+    input.addEventListener('blur', function(){
+      formatInputValue(input);
+      recalc();
+      save();
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', resetDefaults);
+
+  load();
+  allInputs.forEach(formatInputValue);
+  recalc();
+})();
+</script>
+</body>
+</html>

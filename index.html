@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dashboard quản lý, vận hành Dự án Khu đô thị số 3 Thái Đào">
+<title>Dashboard Dự án Khu đô thị số 3 Thái Đào (v65)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+<header>
+  <div class="logo">🏗️</div>
+  <div>
+    <h1>DASHBOARD DỰ ÁN</h1>
+    <div class="sub" id="hd-sub"></div>
+    <div class="sub">Dự án: Khu đô thị số 3, xã Thái Đào, huyện Lạng Giang, tỉnh Bắc Giang (nay là xã Tân Dĩnh, tỉnh Bắc Ninh)</div>
+  </div>
+  <div class="upd">
+    <div>📅 Ngày xem: <b id="hd-today"></b></div>
+  </div>
+</header>
+
+<nav id="nav">
+  <button class="active" data-t="t1">🏠 Tổng quan</button>
+  <button data-t="t2">📅 Tiến độ</button>
+  <button data-t="t3">📊 Khối lượng – Nghiệm thu – Thanh toán</button>
+  <button data-t="t6">📈 Hiệu quả đầu tư</button>
+  <button data-t="t5">📜 Pháp lý &amp; Hợp đồng</button>
+  <button data-t="t7">📝 Báo cáo</button>
+  <button data-t="t8">📷 Hình ảnh</button>
+  <button data-t="t9">⚠️ Vấn đề &amp; Giải pháp</button>
+
+  <button data-t="t10">💹 Hiệu quả thi công</button>
+  <button data-t="t11">📚 Thư viện BC gửi CQNN</button>
+  <button data-t="t12">🏗️ Sản lượng chi tiết</button>
+  <button data-t="t13">🧮 Lãi/Lỗ PP Thực chi</button>
+</nav>
+
+<main>
+<!-- ============ TAB 1: TỔNG QUAN ĐIỀU HÀNH ============ -->
+<div id="t1" class="tab active">
+  <div class="grid kpis">
+    <div class="card kpi b1"><div class="ic">💰</div><div class="lbl">Tổng giá trị 2 HĐ xây lắp</div><div class="val" id="k-tong"></div><div class="pct" style="color:var(--gray)">Trọng Tín + V-Green</div></div>
+    <div class="card kpi b2"><div class="ic">✅</div><div class="lbl">Lũy kế nghiệm thu (dự án)</div><div class="val" id="k-nt"></div><div class="pct" id="k-nt-p" style="color:var(--green)"></div></div>
+    <div class="card kpi b3"><div class="ic">💸</div><div class="lbl">Lũy kế giải ngân (dự án)</div><div class="val" id="k-gn"></div><div class="pct" id="k-gn-p" style="color:var(--orange)"></div></div>
+    <div class="card kpi b5"><div class="ic">🏦</div><div class="lbl">Tạm ứng chưa thu hồi</div><div class="val" id="k-tu"></div><div class="pct" style="color:var(--purple)">Riêng HĐ Trọng Tín</div></div>
+    <div class="card kpi b4"><div class="ic">⏳</div><div class="lbl">Đến mốc 30/10/2026</div><div class="val" id="k-days"></div><div class="pct" id="k-time-p" style="color:var(--gray)"></div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Tình hình theo nhà thầu</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Nhà thầu</th><th>Gói thầu / HĐ</th><th>Giá trị HĐ</th><th>Nghiệm thu lũy kế</th><th>% NT</th><th>Giải ngân lũy kế</th><th>% GN</th><th>Mốc hoàn thành</th><th>Trạng thái</th></tr></thead>
+        <tbody id="nt-tb"></tbody>
+        <tfoot id="nt-tf"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="row2" style="margin-top:16px">
+    <div class="card">
+      <h2 class="sec" style="margin-top:0">⚠️ Top cảnh báo cần xử lý</h2>
+      <div id="alerts"></div>
+    </div>
+    <div class="card">
+      <h2 class="sec" style="margin-top:0">📌 Việc cần Chủ đầu tư quyết định</h2>
+      <div id="decisions"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Tiến độ tổng thể: Tài chính vs Thời gian (toàn dự án)</h2>
+    <div class="pbwrap">
+      <div class="top"><span>Nghiệm thu lũy kế / Tổng 2 HĐ</span><span id="pb1v"></span></div>
+      <div class="pb"><span class="fin" id="pb1"></span></div>
+    </div>
+    <div class="pbwrap">
+      <div class="top"><span>Thời gian đã trôi qua (từ khởi công 20/07/2025 đến 30/10/2026)</span><span id="pb2v"></span></div>
+      <div class="pb"><span class="time" id="pb2"></span></div>
+    </div>
+    <p class="note">Nghiệm thu V-Green tạm tính = 0 do chưa có hồ sơ nghiệm thu — nếu Sếp Tuyền cập nhật, % tài chính sẽ tăng tương ứng. Tạm ứng không tính là khối lượng hoàn thành.</p>
+  </div>
+</div>
+
+<!-- ============ TAB 2: TIẾN ĐỘ ============ -->
+<div id="t2" class="tab">
+  <div class="card">
+    <h2 class="sec" style="margin-top:0">Gantt tổng hợp 2 nhà thầu</h2>
+    <div class="leg">
+      <span><i style="background:var(--blue);opacity:.35"></i> Kế hoạch Trọng Tín (v03)</span>
+      <span><i style="background:var(--teal);opacity:.45"></i> Kế hoạch V-Green (v01)</span>
+      <span><i style="background:var(--green)"></i> Ước hoàn thành theo thời gian</span>
+      <span><i style="background:var(--red);width:3px"></i> Hôm nay</span>
+      <span><i style="background:var(--purple);width:3px"></i> Mốc 30/10/2026</span>
+    </div>
+    <div class="gantt" id="gantt"></div>
+    <p class="note">Tiến độ V-Green theo bảng tiến độ v01 (20/05/2026): 05/05/2026 → 02/10/2026 (150 ngày), nằm trong mốc 30/10/2026 của dự án.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">🔗 Điểm giao diện phối hợp giữa 2 nhà thầu <span class="todo-tag">CẦN CẬP NHẬT</span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>Giao diện</th><th>Bên giao</th><th>Bên nhận</th><th>Hạn yêu cầu</th><th>Trạng thái</th></tr></thead>
+        <tbody id="gd-tb"></tbody>
+      </table>
+    </div>
+    <p class="note">Đây là các điểm rủi ro phối hợp lớn nhất khi có 2 nhà thầu trên cùng mặt bằng. Sếp Tuyền xác nhận ngày thực tế để chú theo dõi — nếu Trọng Tín chậm bàn giao tuyến ống thu gom, trạm XLNT của V-Green xong cũng không thể vận hành thử nghiệm toàn hệ thống.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Bảng trạng thái tiến độ theo hạng mục (cả 2 nhà thầu)</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Mã</th><th>Tên</th><th>Nhà thầu</th><th>Bắt đầu</th><th>Kết thúc</th><th>Số ngày</th><th>% Thời gian</th><th>Trạng thái</th></tr></thead>
+        <tbody id="g-tb"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: KHỐI LƯỢNG – NGHIỆM THU – THANH TOÁN (gộp tab 3+4 cũ) ============ -->
+<div id="t3" class="tab">
+  <div class="grid kpis">
+    <div class="card kpi b1"><div class="ic">📜</div><div class="lbl">Giá trị theo hợp đồng (tổng 2 HĐ)</div><div class="val" id="kg-hd"></div><div class="pct" id="kg-hd-p" style="color:var(--gray)"></div></div>
+    <div class="card kpi b5"><div class="ic">🏗️</div><div class="lbl">Tổng sản lượng nhà thầu thực hiện</div><div class="val" id="kg-sl"></div><div class="pct" id="kg-sl-p" style="color:var(--purple)">Theo bảng KL chi tiết 24/08/2026 (chưa nghiệm thu xác nhận)</div></div>
+    <div class="card kpi b2"><div class="ic">✅</div><div class="lbl">Sản lượng nghiệm thu</div><div class="val" id="kg-nt"></div><div class="pct" id="kg-nt-p" style="color:var(--green)"></div></div>
+    <div class="card kpi b3"><div class="ic">💵</div><div class="lbl">Thanh toán (KL hoàn thành, chưa gồm tạm ứng)</div><div class="val" id="kg-tt"></div><div class="pct" id="kg-tt-p" style="color:var(--orange)"></div></div>
+    <div class="card kpi b4"><div class="ic">🏦</div><div class="lbl">Giải ngân lũy kế (thanh toán + tạm ứng)</div><div class="val" id="kg-gn"></div><div class="pct" id="kg-gn-p" style="color:var(--gray)"></div></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="ctrl">
+      <span style="font-weight:600">Lọc nhà thầu:</span>
+      <select id="f-nt" onchange="renderKL()">
+        <option value="">Tất cả</option>
+        <option value="TT">Trọng Tín (hạ tầng)</option>
+        <option value="VG">V-Green (XLNT)</option>
+      </select>
+      <span style="font-weight:600">Lọc hạng mục:</span>
+      <div style="position:relative">
+        <button type="button" class="btn" id="f-hm-btn" style="background:#fff;color:#1e293b;border:1px solid var(--line)" onclick="document.getElementById('f-hm-panel').hidden=!document.getElementById('f-hm-panel').hidden">Tất cả ▾</button>
+        <div id="f-hm-panel" hidden style="position:absolute;top:110%;left:0;z-index:30;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px rgba(15,42,74,.18);padding:10px 14px;max-height:320px;overflow:auto;min-width:320px">
+          <label style="display:block;margin:3px 0;font-weight:700"><input type="checkbox" id="fhm-tong" onchange="renderKL()"> Tổng tất cả hạng mục (1 cột tổng)</label>
+          <div style="border-top:1px solid var(--line);margin:6px 0"></div>
+          <div id="fhm-list"></div>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer"><input type="checkbox" id="f-showval" onchange="renderKL()"> Hiện giá trị trên cột</label>
+    </div>
+    <div class="chartbox tall"><canvas id="barKL"></canvas></div>
+    <p class="note">Sản lượng Trọng Tín lấy theo <b>bảng khối lượng chi tiết 618 công tác, cập nhật 24/08/2026</b> — nguồn dùng chung cho các tab “Sản lượng chi tiết”, “Hiệu quả thi công” và “Lãi/Lỗ PP Thực chi”: tổng giá trị HĐ 54.004.604.560 đ · thực tế thi công 17.294.284.032 đ · đã nghiệm thu–thanh toán 8.919.343.187 đ · dở dang 8.374.940.845 đ. V-Green chưa có báo cáo sản lượng. Giải ngân vẫn theo hồ sơ thanh toán (29,03 tỷ, gồm tạm ứng).</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Bảng khối lượng: Sản lượng → Nghiệm thu → Thanh toán</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>HM</th><th>Tên</th><th>Nhà thầu</th><th>Giá trị HĐ</th><th>Sản lượng thi công</th><th>Nghiệm thu</th><th>Thanh toán luỹ kế</th><th>Chênh (SL−NT)</th></tr></thead>
+        <tbody id="kl-tb"></tbody>
+        <tfoot id="kl-tf"></tfoot>
+      </table>
+    </div>
+    <p class="note">Cột Thanh toán: lũy kế KL hoàn thành đã thanh toán lần 1 + lần 2 theo PL03 (file ai_3_thanhtoan_TrongTin_lan2.xlsx), chưa gồm tạm ứng. Chênh lệch SL−NT phản ánh "độ trễ hồ sơ". Khoảng cách lớn kéo dài = rủi ro tồn đọng hồ sơ nghiệm thu, tranh chấp khối lượng về sau.</p>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <h2 class="sec" style="margin-top:0">Timeline thanh toán (2 hợp đồng)</h2>
+      <div class="tl" id="tl"></div>
+    </div>
+    <div class="card">
+      <h2 class="sec" style="margin-top:0">Theo dõi tạm ứng</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Hợp đồng</th><th>Đã tạm ứng</th><th>Đã thu hồi</th><th>Còn lại</th></tr></thead>
+          <tbody id="tu-tb"></tbody>
+        </table>
+      </div>
+      <div class="alert red" style="margin-top:12px"><div class="ai">🏦</div><div><b>Tạm ứng Trọng Tín còn treo 20,11 tỷ (95,8% giá trị tạm ứng)</b>
+        Tốc độ thu hồi qua 2 kỳ mới đạt ~0,89 tỷ. Với giá trị HĐ còn lại, cần cơ chế thu hồi mạnh hơn theo Điều khoản tạm ứng của HĐ — chú kiến nghị nâng tỷ lệ thu hồi mỗi kỳ thanh toán.</div></div>
+      <h2 class="sec">Dự kiến dòng tiền còn phải chi <span class="todo-tag">TẠM TÍNH</span></h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Hợp đồng</th><th>Giá trị HĐ</th><th>Đã giải ngân</th><th>Còn phải chi (tối đa)</th></tr></thead>
+          <tbody id="ct-tb"></tbody>
+        </table>
+      </div>
+      <p class="note">Còn phải chi = giá trị HĐ − đã giải ngân (chưa tính phát sinh/điều chỉnh). Phân bổ theo tháng cần kế hoạch thanh toán từng nhà thầu — Sếp cung cấp để chú dựng biểu dòng tiền chi tiết.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Bảng chi tiết các đợt thanh toán</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>HĐ</th><th>Lần</th><th>Ngày</th><th>Số biên bản</th><th>Giá trị nghiệm thu</th><th>Giải ngân</th><th>Trong đó: trả nhà thầu</th><th>Giữ bảo hành</th><th>Thu hồi tạm ứng</th></tr></thead>
+        <tbody id="tt-tb"></tbody>
+        <tfoot id="tt-tf"></tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Lịch sử điều chỉnh giá trị hợp đồng</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>HĐ</th><th>Nội dung</th><th>Số phụ lục</th><th>Ngày ký</th><th>Giá trị sau điều chỉnh</th></tr></thead>
+        <tbody id="dc-tb"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 5: PHÁP LÝ & HỢP ĐỒNG ============ -->
+<div id="t5" class="tab">
+  <div class="card">
+    <h2 class="sec" style="margin-top:0">Thông tin hợp đồng thi công &amp; bảo lãnh</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Hợp đồng</th><th>Nhà thầu</th><th>Giá trị</th><th>Hiệu lực</th><th>Bảo lãnh THHĐ</th><th>Bảo lãnh tạm ứng</th><th>Hạn bảo lãnh</th></tr></thead>
+        <tbody id="hd-tb"></tbody>
+      </table>
+    </div>
+    <div class="alert orange" style="margin-top:12px"><div class="ai">📋</div><div><b>Chưa có phụ lục gia hạn HĐ Trọng Tín cho mốc 30/10/2026</b>
+      HĐ gốc mốc hoàn thành 31/08/2026; tiến độ v03 đã lùi sang 30/10/2026 nhưng mới là kế hoạch nội bộ. Cần ký phụ lục gia hạn chính thức và gia hạn bảo lãnh tương ứng — nếu không, quyền phạt chậm tiến độ của Chủ đầu tư có thể bị suy yếu khi tranh chấp.</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Danh mục văn bản pháp lý</h2>
+    <div class="ctrl">
+      <span style="font-weight:600">Giai đoạn:</span>
+      <select id="vb-gd" onchange="renderVB()"><option value="">Tất cả</option></select>
+      <span style="font-weight:600">Đơn vị:</span>
+      <select id="vb-dv" onchange="renderVB()"><option value="">Tất cả</option></select>
+      <input id="vb-search" type="search" placeholder="🔍 Tìm số / tên văn bản..." oninput="renderVB()" style="min-width:240px">
+      <span class="note" style="margin:0" id="vb-count"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th style="width:40px">STT</th><th>Ngày</th><th>Số văn bản</th><th>Giai đoạn</th><th>Đơn vị</th><th style="text-align:left">Tên văn bản</th><th>File gốc</th></tr></thead>
+        <tbody id="vb-tb"></tbody>
+      </table>
+    </div>
+    <p class="note">Click tên văn bản (chữ xanh 🔗) để mở file gốc trên Google Drive. Bổ sung link: điền URL vào trường <code>link</code> trong mảng <code>vanBanData</code>.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">Hồ sơ pháp lý còn thiếu / cần hoàn thiện <span class="todo-tag">CẦN CẬP NHẬT</span></h2>
+    <div id="missing-tb"></div>
+  </div>
+</div>
+
+<!-- ============ TAB 6: HIỆU QUẢ ĐẦU TƯ ============ -->
+<div id="t6" class="tab">
+  <div class="todo-banner">
+    📈 <b>Đã nạp số liệu:</b> TMĐT theo QĐ 014/QĐ-BH (01/04/2025) và tiền sử dụng đất + doanh thu theo <b>Tờ trình 494/TTr-SNNMT (22/6/2025) — TẠM TÍNH, chưa phải quyết định phê duyệt giá đất chính thức</b>.
+    Còn chờ Sếp Tuyền bổ sung: (1) QĐ phê duyệt giá đất chính thức; (2) phụ lục tính toán của đơn vị tư vấn định giá / bản vẽ QH-03.1, QH-05 để gán 173 lô theo mặt cắt; (3) tổng tiền SDĐ đã nộp thực tế (chứng từ); (4) xác nhận khấu trừ chi phí GPMB vào tiền SDĐ.
+  </div>
+
+  <div class="card">
+    <h2 class="sec" style="margin-top:0">1. Cơ cấu tổng mức đầu tư <span class="todo-tag">CẦN CẬP NHẬT</span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Khoản mục</th><th>Giá trị theo BCNCKT duyệt</th><th>Thực tế / cam kết đến nay</th><th>Ghi chú</th></tr></thead>
+        <tbody id="tmdt-tb"></tbody>
+      </table>
+    </div>
+    <p class="note">Cột "thực tế" mới điền được 2 hợp đồng xây lắp đã ký. Các khoản còn lại chờ số liệu.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">2. Nguồn thu — quỹ đất thương phẩm <span class="todo-tag">CẦN CẬP NHẬT</span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Loại sản phẩm</th><th>Số lô</th><th>Diện tích (m²)</th><th>Đơn giá dự kiến (đ/m²)</th><th>Doanh thu dự kiến</th><th>Điều kiện mở bán</th></tr></thead>
+        <tbody id="thu-tb"></tbody>
+      </table>
+    </div>
+    <div class="alert blue" style="margin-top:10px"><div class="ai">⚖️</div><div><b>Lưu ý pháp lý về điều kiện kinh doanh</b>
+      Theo Luật Kinh doanh BĐS 2023 (hiệu lực 01/08/2024), đất nền chỉ đủ điều kiện chuyển nhượng khi hoàn thành hạ tầng kỹ thuật theo tiến độ được duyệt và hoàn thành nghĩa vụ tài chính đất đai. Mốc hoàn thành hạ tầng 30/10/2026 vì vậy quyết định trực tiếp thời điểm ghi nhận dòng tiền thu — chậm hạ tầng là chậm cả dòng doanh thu.</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">3. Chỉ tiêu hiệu quả đầu tư <span class="todo-tag">CẦN CẬP NHẬT</span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Chỉ tiêu</th><th>Kịch bản cơ sở</th><th>KB chậm bán 6 tháng</th><th>KB giá giảm 10%</th><th>Theo BCNCKT duyệt</th></tr></thead>
+        <tbody id="hq-tb"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 class="sec" style="margin-top:0">4. Các biến số ảnh hưởng lớn nhất đến hiệu quả (định tính, chờ số liệu để định lượng)</h2>
+    <div id="sens-tb"></div>
+    <p class="note">Khi có đủ số liệu, chú sẽ dựng phân tích độ nhạy (tornado chart) và biểu đồ dòng tiền tích lũy — xác định nhu cầu vốn đỉnh và điểm hòa vốn của dự án.</p>
+  </div>
+</div>
+
+
+<!-- ============ TAB 7: BÁO CÁO CÔNG VIỆC HÀNG TUẦN ============ -->
+<div id="t7" class="tab">
+  <div class="card">
+    <div class="ctrl">
+      <span style="font-weight:600">Chọn kỳ báo cáo:</span>
+      <select id="bc-sel" onchange="renderBC()"></select>
+      <button class="btn" onclick="bcOpenFull()">↗️ Mở toàn màn hình / In</button>
+    </div>
+    <iframe id="bc-frame" style="width:100%;height:1400px;border:1px solid var(--line);border-radius:8px;background:#fff;display:none"></iframe>
+
+    <div id="bc2-wrap" style="display:block">
+      <div style="border-bottom:2px solid #007bff;padding-bottom:14px;margin-bottom:14px">
+        <h2 style="font-size:22px;color:#1a1a1a;margin-bottom:2px">BÁO CÁO THỰC HIỆN CÔNG VIỆC THEO HỌP GIAO BAN</h2>
+        <p style="font-size:14px;color:#666;margin:0">Kỳ 2 tháng 8/2026 (07/8/2026 – 15/8/2026)</p>
+        <p style="font-size:14px;color:#666;margin:0">Dự án Khu Đô Thị Số 3 Xã Thái Đào (Nay Là Xã Tân Dĩnh, Tỉnh Bắc Ninh)</p>
+      </div>
+      <div class="ctrl" style="margin-bottom:10px">
+        <button class="btn" onclick="bc2AddRow()">➕ Thêm dòng</button>
+        <button class="btn" onclick="bc2Save(true)">💾 Lưu</button>
+        <span id="bc2-status" class="note" style="margin:0"></span>
+      </div>
+      <div id="bc2-tb"></div>
+      <p class="note">Bấm vào ô để sửa trực tiếp (Nội dung công việc, Đơn vị chủ trì, Deadline, Trạng thái, Ghi chú). Dữ liệu tự lưu khi rời khỏi ô và khi bấm 💾 Lưu — lưu vào bộ nhớ trình duyệt (localStorage) trên máy này. Nguồn khởi tạo bảng: Master KB v3 — Chỉ đạo CĐT tại họp giao ban Tháng 7/2026 (họp ngày 04/8/2026).</p>
+    </div>
+
+    <p class="note">Báo cáo tuần đã được nhúng thẳng vào file dashboard này — không cần file kèm theo. Muốn thêm kỳ báo cáo mới, gửi file HTML báo cáo cho Chú Dương để nhúng bổ sung.</p>
+  </div>
+</div>
+
+<!-- ============ TAB 8: HÌNH ẢNH ============ -->
+<div id="t8" class="tab">
+  <div class="todo-banner">📷 <b>Tab hình ảnh — khung định dạng sẵn theo mẫu trang ảnh báo cáo tuần.</b> Chưa có ảnh; khi Sếp Tuyền gửi ảnh, chú sẽ chèn vào đúng khung (thay ô nét đứt bằng thẻ &lt;img&gt;) và cập nhật tiêu đề mục, ngày chụp.</div>
+  <div class="card" style="margin-top:16px">
+    <div style="text-align:center;border-bottom:2px solid #007bff;padding-bottom:12px;margin-bottom:16px">
+      <h2 style="font-size:19px;color:#1a1a1a">HÌNH ẢNH CÔNG TRƯỜNG — MỤC [SỐ]: [TÊN HẠNG MỤC 1]</h2>
+      <p style="font-size:14px;color:#666">Dự án Khu Đô Thị Số 3 Thái Đào - Xã Tân Dĩnh, Tỉnh Bắc Ninh</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:12px">
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 1]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 2]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+    </div>
+    <p style="font-size:12px;color:#999">Ảnh chụp ngày [.../.../2026]</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="text-align:center;border-bottom:2px solid #007bff;padding-bottom:12px;margin-bottom:16px">
+      <h2 style="font-size:19px;color:#1a1a1a">HÌNH ẢNH CÔNG TRƯỜNG — MỤC [SỐ]: [TÊN HẠNG MỤC 2]</h2>
+      <p style="font-size:14px;color:#666">Dự án Khu Đô Thị Số 3 Thái Đào - Xã Tân Dĩnh, Tỉnh Bắc Ninh</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:12px">
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 1]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 2]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+    </div>
+    <p style="font-size:12px;color:#999">Ảnh chụp ngày [.../.../2026]</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="text-align:center;border-bottom:2px solid #007bff;padding-bottom:12px;margin-bottom:16px">
+      <h2 style="font-size:19px;color:#1a1a1a">HÌNH ẢNH CÔNG TRƯỜNG — MỤC [SỐ]: [TÊN HẠNG MỤC 3]</h2>
+      <p style="font-size:14px;color:#666">Dự án Khu Đô Thị Số 3 Thái Đào - Xã Tân Dĩnh, Tỉnh Bắc Ninh</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:12px">
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 1]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 2]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+    </div>
+    <p style="font-size:12px;color:#999">Ảnh chụp ngày [.../.../2026]</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="text-align:center;border-bottom:2px solid #007bff;padding-bottom:12px;margin-bottom:16px">
+      <h2 style="font-size:19px;color:#1a1a1a">HÌNH ẢNH CÔNG TRƯỜNG — MỤC [SỐ]: [TÊN HẠNG MỤC 4]</h2>
+      <p style="font-size:14px;color:#666">Dự án Khu Đô Thị Số 3 Thái Đào - Xã Tân Dĩnh, Tỉnh Bắc Ninh</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:12px">
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 1]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+      <div><h3 style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px">[Tiêu đề ảnh 2]</h3>
+        <div style="width:100%;height:340px;border:2px dashed #94a3b8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f8fafc">📷 Chưa có ảnh — Sếp gửi sau</div></div>
+    </div>
+    <p style="font-size:12px;color:#999">Ảnh chụp ngày [.../.../2026]</p>
+  </div>
+</div>
+
+<!-- ============ TAB 9: VẤN ĐỀ XUẤT SINH VÀ GIẢI PHÁP ============ -->
+<div id="t9" class="tab">
+  <div class="card">
+    <h2 class="sec" style="margin-top:0">Vấn đề xuất sinh và giải pháp</h2>
+    <div class="ctrl" style="margin-bottom:10px">
+      <button class="btn" onclick="psAddRow()">➕ Thêm dòng</button>
+      <button class="btn" onclick="psSave()">💾 Lưu thông tin</button>
+      <span id="ps-status" class="note" style="margin:0"></span>
+    </div>
+    <div id="ps-tb"></div>
+    <p class="note">Bấm vào ô để sửa trực tiếp. Dữ liệu tự lưu khi gõ xong và khi bấm 💾 Lưu — được ghi vào bộ nhớ trình duyệt (localStorage) trên máy này.</p>
+  </div>
+</div>
+
+
+<!-- ===== TAB t10: 💹 Hiệu quả thi công (nguồn: 2.html) ===== -->
+<div id="t10" class="tab">
+  <iframe class="embed-frame" title="Hiệu quả thi công" src="pages/hieu-qua-thi-cong.html" loading="lazy"></iframe>
+</div>
+
+<!-- ===== TAB t11: 📚 Thư viện BC gửi CQNN (nguồn: 3.html) ===== -->
+<div id="t11" class="tab">
+  <iframe class="embed-frame" title="Thư viện báo cáo gửi CQNN" src="pages/thu-vien-bao-cao.html" loading="lazy"></iframe>
+</div>
+
+<!-- ===== TAB t12: 🏗️ Sản lượng chi tiết (nguồn: 4.html) ===== -->
+<div id="t12" class="tab">
+  <iframe class="embed-frame" title="Sản lượng chi tiết" src="pages/san-luong-chi-tiet.html" loading="lazy"></iframe>
+</div>
+
+<!-- ===== TAB t13: 🧮 Lãi/Lỗ PP Thực chi (nguồn: 5.html) ===== -->
+<div id="t13" class="tab">
+  <iframe class="embed-frame" title="Lãi/Lỗ PP Thực chi" src="pages/lai-lo-thuc-chi.html" loading="lazy"></iframe>
+</div>
+
+<footer>
+  Dashboard Quản lý Dự án – Khu đô thị số 3 Thái Đào &nbsp;|&nbsp; Chủ đầu tư: Công ty CP Đầu tư và Phát triển Bắc Hà<br>
+  Nhà thầu hạ tầng: Công ty CP Trọng Tín Group (HĐ 1507/2025/HĐXD/BH-TT) &nbsp;|&nbsp; Nhà thầu XLNT: Công ty TNHH Môi trường V-GREEN (HĐ 68/2026/HĐKT/BH-VG)<br>
+  <button class="btn" onclick="window.print()" style="margin-top:10px">🖨️ In / Xuất PDF</button>
+  <span style="margin-left:10px;font-style:italic">Sửa số liệu: chỉnh các mảng dữ liệu trong thẻ <code>&lt;script&gt;</code>. Ô nền vàng = CẦN CẬP NHẬT.</span>
+</footer>
+
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

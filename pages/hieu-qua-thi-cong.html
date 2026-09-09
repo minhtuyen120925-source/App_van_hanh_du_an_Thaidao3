@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light" data-tone="bh">
+<head>
+<meta charset="UTF-8">
+<title>Ước tính khoản lỗ Nhà thầu mới</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0; padding: 24px; color: #1e293b;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(41,182,232,0.10) 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(236,72,153,0.10) 0%, transparent 45%),
+      #f4f7fb;
+    background-attachment: fixed;
+  }
+  .page-header-inner { max-width: 1350px; margin: 0 auto; }
+  .page { max-width: 1350px; margin: 64px auto 0 auto; display: flex; gap: 20px; align-items: flex-start; }
+  .page-header {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
+    padding: 18px 24px;
+    box-sizing: border-box;
+    text-align: left;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(41,182,232,0.10) 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(236,72,153,0.10) 0%, transparent 45%),
+      #f4f7fb;
+    background-attachment: fixed;
+    background: #f4f7fb;
+  }
+
+  /* ===== SIDEBAR (base, overridden below by Phương án A) ===== */
+  .sidebar h3 { font-size: 10px; color: #1e63b3; margin: 0 0 11px 0; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; letter-spacing: 0.5px; }
+  .side-item { margin-bottom: 11px; }
+  .side-item label { display: block; font-size: 10px; color: #64748b; margin-bottom: 3px; font-weight: 600; line-height: 1.4; }
+  .side-item input, .side-item select {
+    width: 100%; padding: 6px 7px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 10px; text-align: right;
+    background: #ffffff; color: #1e293b;
+  }
+  .side-item select { text-align: left; font-size: 10px; }
+  .side-item .hint { font-size: 10px; color: #94a3b8; margin-top: 3px; line-height: 1.4; }
+  .side-divider { border-top: 1px dashed #e2e8f0; margin: 11px 0; }
+  .side-note { font-size: 10px; margin-top: 3px; }
+  .ratio-warn { color: #dc2626; font-weight: 600; }
+  .ratio-ok { color: #1e63b3; font-weight: 600; }
+  .ratio-highlight-side {
+    background: #f1f5f9; border: 1px solid #c4b5fd; border-radius: 8px;
+    padding: 8px 10px; font-size: 10px; color: #1e293b; margin-top: 10px; line-height: 1.6;
+  }
+  .ratio-highlight-side b { color: #7c3aed; }
+
+  /* ===== MAIN ===== */
+  .main { flex: 1; min-width: 0; }
+  h1 {
+    font-size: 30px;
+    margin-bottom: 2px;
+    margin-top: 0;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #1e63b3;
+    text-shadow: 0 0 18px rgba(77,216,232,0.45);
+    text-transform: uppercase;
+  }
+  .sub { color: #64748b; font-size: 13px; margin-bottom: 16px; }
+
+  .summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .sum-card { background: #ffffff; border-radius: 12px; padding: 14px 18px; box-shadow: 0 0 0 1px rgba(41,182,232,0.25), 0 4px 16px rgba(0,0,0,0.4); border-left: 4px solid #1e63b3; }
+  .sum-card.total { border-left-color: #dc2626; background: #fff7ed; box-shadow: 0 0 0 1px rgba(236,72,153,0.35), 0 4px 20px rgba(236,72,153,0.15); }
+  .sum-card .label { font-size: 12px; color: #64748b; font-weight: 600; }
+  .sum-card.total .label { color: #64748b; }
+  .sum-card .value { font-size: 20px; font-weight: 700; color: #1e293b; margin-top: 4px; }
+  .sum-card.total .value { color: #ffffff; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tab-btn { padding: 7px 12px; border: none; border-radius: 6px; background: #f1f5f9; color: #64748b; font-size: 10px; font-weight: 600; cursor: pointer; }
+  .tab-btn.active { background: #ffffff; color: #1e63b3; box-shadow: 0 -1px 0 0 #1e63b3 inset; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .warn {
+    background: linear-gradient(135deg, #fecaca 0%, #fef2f2 100%);
+    border: 1px solid #dc2626; color: #1e293b; padding: 10px 14px; border-radius: 8px;
+    font-size: 12.5px; margin-bottom: 16px; line-height: 1.55;
+    box-shadow: 0 0 20px rgba(236,72,153,0.15);
+  }
+  .warn b { color: #dc2626; }
+
+  .panel { background: #ffffff; border-radius: 12px; padding: 18px 22px; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 4px 16px rgba(0,0,0,0.4); margin-bottom: 18px; }
+  .panel h3 { font-size: 14px; margin: 0 0 12px 0; color: #1e293b; }
+
+  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .input-grid.cols2 { grid-template-columns: repeat(2, 1fr); }
+  .input-item label { display: block; font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
+  .input-item input, .input-item select { width: 100%; padding: 7px 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; text-align: right; background: #ffffff; color: #1e293b; }
+  .input-item select { text-align: left; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  thead th { background: #ffffff; color: #1e63b3; font-size: 12px; padding: 8px 10px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+  thead th:first-child { text-align: left; }
+  tbody td { padding: 7px 10px; font-size: 12.5px; text-align: right; border-bottom: 1px solid #eef2f7; color: #334155; }
+  tbody td:first-child { text-align: left; color: #1e293b; }
+  tbody tr:nth-child(even) { background: #ffffff; }
+  .loss-cell { color: #dc2626; font-weight: 600; }
+  tfoot td { padding: 10px; font-size: 13.5px; font-weight: 700; background: #ffffff; color: #1e293b; text-align: right; border-top: 1px solid #1e63b3; }
+  tfoot td:first-child { text-align: left; }
+  tfoot .total-loss { color: #dc2626; }
+
+  .ratio-note { font-size: 11.5px; color: #94a3b8; margin-top: 6px; }
+  .footnote { margin-top: 10px; font-size: 11.5px; color: #64748b; line-height: 1.6; background: #ffffff; padding: 10px 14px; border-radius: 8px; }
+
+  .month-box { background: #f1f5f9; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #1e293b; margin-top: 10px; border-left: 4px solid #7c3aed; }
+  .month-box b { font-size: 16px; color: #1e63b3; }
+
+  .party-title { font-size: 14.5px; font-weight: 700; margin: 18px 0 8px 0; padding: 8px 14px; border-radius: 8px; }
+  .party-title.chuatc { background: rgba(41,182,232,0.12); color: #1e63b3; border: 1px solid rgba(41,182,232,0.3); }
+  .party-title.dangdo { background: rgba(155,127,232,0.12); color: #7c3aed; border: 1px solid rgba(155,127,232,0.3); }
+
+  /* ===== PARTY SELECTOR ===== */
+  .party-selector { margin-bottom: 16px; }
+  .party-dropdown {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #1e63b3;
+    background: #ffffff;
+    color: #1e63b3;
+    cursor: pointer;
+    min-width: 220px;
+    box-shadow: 0 0 16px rgba(41,182,232,0.20);
+  }
+  .party-dropdown:hover { border-color: #dc2626; box-shadow: 0 0 16px rgba(236,72,153,0.25); }
+  .party-dropdown option { background: #ffffff; color: #1e293b; font-weight: 600; }
+
+  .party-header {
+    font-size: 15px; font-weight: 800; padding: 10px 16px; border-radius: 8px;
+    margin: 20px 0 10px 0;
+  }
+  .party-header.nt-header { background: rgba(41,182,232,0.15); color: #1e63b3; border: 1px solid rgba(41,182,232,0.4); }
+  .party-header.tt-header { background: rgba(236,72,153,0.15); color: #dc2626; border: 1px solid rgba(236,72,153,0.4); }
+
+  /* ===== SIDEBAR (Phương án A: icon rail dọc) ===== */
+  .sidebar {
+    width: 170px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 88px;
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(41,182,232,0.25), 0 8px 30px rgba(0,0,0,0.5);
+  }
+  .icon-rail {
+    width: 46px;
+    flex-shrink: 0;
+    background: #f4f7fb;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-right: 1px solid #eef2f7;
+  }
+  .rail-icon {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 10px 3px; margin: 0 6px; border-radius: 8px;
+    color: #94a3b8; cursor: pointer; font-size: 10px; font-weight: 600; text-align: center;
+  }
+  .rail-icon .ico { font-size: 20px; }
+  .rail-icon:hover { background: #f1f5f9; color: #334155; }
+  .rail-icon.active {
+    background: linear-gradient(180deg, rgba(41,182,232,0.20), rgba(41,182,232,0.06));
+    color: #1e63b3;
+    box-shadow: inset 0 0 0 1px rgba(41,182,232,0.35);
+  }
+  .sidebar-detail { flex: 1; min-width: 0; padding: 13px 8px; }
+
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+
+  .party-tree-item {
+    display: flex; align-items: center; gap: 6px; padding: 7px 8px; border-radius: 7px;
+    font-size: 10px; font-weight: 600; color: #334155; cursor: pointer; margin-bottom: 3px;
+    border: 1px solid transparent;
+  }
+  .party-tree-item:hover { background: #f1f5f9; }
+  .party-tree-item.active { background: rgba(41,182,232,0.12); color: #1e63b3; border-color: rgba(41,182,232,0.35); }
+  .party-tree-item.sub { margin-left: 13px; font-size: 10px; font-weight: 500; }
+  .party-tree-item.tt.active { background: rgba(236,72,153,0.12); color: #dc2626; border-color: rgba(236,72,153,0.35); }
+
+  .toc-item {
+    display: block; padding: 9px 10px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+    color: #334155; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent;
+  }
+  .toc-item:hover { background: #f1f5f9; }
+  .toc-item.active { background: rgba(155,127,232,0.12); color: #7c3aed; border-color: rgba(155,127,232,0.35); }
+  .toc-sub { font-size: 11px; color: #94a3b8; padding: 3px 10px 8px 22px; }
+
+  .sub-selected-tag {
+    display: inline-block; padding: 7px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+    background: rgba(41,182,232,0.12); color: #1e63b3; border: 1px solid rgba(41,182,232,0.35);
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .page { flex-direction: column; }
+    .sidebar { width: 100%; position: static; }
+  }
+</style>
+<title>Hiệu quả thi công dự án — Navy Glow</title>
+<style id="bh-theme">
+/* ============ BH-THEME v1 — đồng nhất với Dashboard tổng ============ */
+:root{--bh-navy:#0f2a4a;--bh-navy2:#153b66;--bh-blue:#1e63b3;--bh-sky:#e8f1fb;--bh-bg:#f4f7fb;
+--bh-card:#fff;--bh-line:#e2e8f0;--bh-ink:#1e293b;--bh-gray:#64748b;--bh-orange:#f59e0b;
+--bh-green:#16a34a;--bh-red:#dc2626;--bh-purple:#7c3aed;--bh-teal:#0d9488;}
+html{color-scheme:light !important;}
+html,body{font-family:"Segoe UI",Roboto,Arial,sans-serif !important;font-size:14px !important;
+  line-height:1.5 !important;background:#f4f7fb !important;color:#1e293b !important;}
+*{font-family:inherit !important;text-shadow:none !important;}
+h1{font-size:20px !important;font-weight:800 !important;letter-spacing:.3px !important;}
+h2{font-size:16px !important;font-weight:700 !important;color:#0f2a4a !important;}
+h3{font-size:13.5px !important;font-weight:700 !important;color:#153b66 !important;letter-spacing:0 !important;}
+a{color:#1e63b3 !important;}
+p,li,label,span,div{letter-spacing:0 !important;}
+button{font-size:13px !important;font-weight:600 !important;border-radius:8px !important;cursor:pointer;}
+input,select,textarea{font-size:13px !important;border-radius:8px !important;background:#fff !important;
+  color:#1e293b !important;border:1px solid #e2e8f0 !important;}
+table{border-collapse:collapse !important;font-size:13px !important;font-variant-numeric:tabular-nums;}
+th{background:#0f2a4a !important;color:#fff !important;font-weight:600 !important;
+  border-color:#1c3f68 !important;}
+td{border-bottom:1px solid #e2e8f0 !important;}
+tbody tr:hover{background:#e8f1fb !important;}
+[class*="card"],[class*="panel"],[class*="box"],[id*="wrap"]{border-radius:12px !important;}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#c9d6e5;border-radius:6px}
+::-webkit-scrollbar-track{background:#eef2f7}
+.bh-hero{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;color:#fff !important;
+  border-radius:12px !important;padding:14px 20px !important;margin-bottom:18px !important;
+  box-shadow:0 2px 8px rgba(15,42,74,.18) !important;border:none !important;}
+.bh-hero h1,.bh-hero h2,.bh-hero p,.bh-hero span,.bh-hero div{color:#fff !important;}
+
+.page-header{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;padding:12px 24px !important;
+  box-shadow:0 2px 8px rgba(15,42,74,.18) !important;}
+.page-header h1{color:#fff !important;font-size:19px !important;}
+.page{margin-top:58px !important;max-width:1400px !important;}
+.sidebar,.sum-card,.main>div{box-shadow:0 1px 4px rgba(15,42,74,.08) !important;}
+.sum-card{background:#fff !important;border:1px solid #e2e8f0 !important;border-left:5px solid #1e63b3 !important;}
+.sum-card.total{border-left-color:#dc2626 !important;background:#fff !important;}
+.sum-card .value{font-size:19px !important;color:#0f2a4a !important;font-weight:800 !important;}
+.sum-card .label{font-size:12.5px !important;color:#64748b !important;}
+.tab-btn{font-size:13px !important;background:#eef2f7 !important;color:#64748b !important;padding:9px 14px !important;}
+.tab-btn.active{background:#1e63b3 !important;color:#fff !important;}
+.sub{color:#64748b !important;font-size:12px !important;font-style:italic !important;}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>HIỆU QUẢ THI CÔNG DỰ ÁN</h1>
+  </div>
+</div>
+<div class="page">
+
+  <!-- ============ SIDEBAR: GIẢ ĐỊNH ĐẦU VÀO ============ -->
+  <div class="sidebar">
+    <div class="icon-rail">
+      <div class="rail-icon active" data-panel="doituong" onclick="showSidePanel('doituong')" title="Phần thi công">
+        <span class="ico">👥</span><span class="rail-label">Phần thi công</span>
+      </div>
+      <div class="rail-icon" data-panel="giadinh" onclick="showSidePanel('giadinh')" title="Biến động giá">
+        <span class="ico">⚙️</span><span class="rail-label">Biến động giá</span>
+      </div>
+      <div class="rail-icon" data-panel="tytrong" onclick="showSidePanel('tytrong')" title="Tỉ trọng đơn giá">
+        <span class="ico">⚖️</span><span class="rail-label">Tỉ trọng đơn giá</span>
+      </div>
+    </div>
+
+    <div class="sidebar-detail">
+    <!-- PANEL 1: GIẢ ĐỊNH ĐẦU VÀO -->
+    <!-- PANEL 2: NGUOI QUAN LY -->
+    <div class="sidebar-panel active" id="panel-doituong">
+      <h3>Phần thi công</h3>
+      <div class="party-tree-item tt" id="tree-tt" onclick="setParty('tt')">Trọng Tín</div>
+      <div class="party-tree-item" id="tree-nt" onclick="setParty('nt')">Nhà thầu mới</div>
+      <div class="party-tree-item active" id="tree-both" onclick="setParty('both')">Cả 2 nhà thầu</div>
+    </div>
+    <!-- END PANEL 2 -->
+
+    <!-- PANEL 1: GIẢ ĐỊNH ĐẦU VÀO -->
+    <div class="sidebar-panel" id="panel-giadinh">
+    <h3>⚙️ Biến động giá</h3>
+
+    <input type="hidden" id="kClass" value="145205.136">
+
+    <div class="side-item">
+      <label>Vật liệu tăng (%)</label>
+      <input type="number" id="x1" value="9.04" step="0.1" oninput="calcAll()">
+    </div>
+    <div class="side-item">
+      <label>Nhân công tăng (%)</label>
+      <input type="number" id="x2" value="10" oninput="calcAll()">
+    </div>
+    <div class="side-item">
+      <label>Ca máy tăng (%)</label>
+      <input type="number" id="x3" value="25" oninput="calcAll()">
+    </div>
+
+    <div class="ratio-highlight-side" style="display:none;">
+      X1 auto = Tổng tiền thực mua đất (10.281.678.840 đ) ÷ (Tổng KL đất 64.935 m³ × ĐG HĐ theo mốc chọn) − 1 = <b id="ratioAuto">9,04%</b>
+      <br><br>
+      Chênh lệch % áp dụng = Tỷ trọng VL×X1 + NC×X2 + M×X3 = <b id="weightedPctShow">11,63%</b>
+    </div>
+    </div>
+    <!-- END PANEL 1 -->
+
+    <!-- PANEL 1B: TỈ TRỌNG GIÁ -->
+    <div class="sidebar-panel" id="panel-tytrong">
+    <h3>⚖️ Tỉ trọng đơn giá</h3>
+
+    <div class="side-item">
+      <label>Vật liệu (%)</label>
+      <input type="number" id="rvl" value="65" oninput="onRatioInput('rvl')">
+    </div>
+    <div class="side-item">
+      <label>Nhân công (%)</label>
+      <input type="number" id="rnc" value="20" oninput="onRatioInput('rnc')">
+    </div>
+    <div class="side-item">
+      <label>Ca máy (%)</label>
+      <input type="number" id="rmay" value="15" oninput="onRatioInput('rmay')">
+    </div>
+    <div class="side-note" id="ratioNote"></div>
+    </div>
+    <!-- END PANEL 1B -->
+    </div>
+    <!-- END sidebar-detail -->
+  </div>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <div class="main">
+
+    <div class="summary">
+      <div class="sum-card">
+        <div class="label" id="labelDirect">LỖ CHI PHÍ TRỰC TIẾP</div>
+        <div class="value" id="sumDirect">0 đ</div>
+      </div>
+      <div class="sum-card">
+        <div class="label" id="labelIndirect">LỖ/CHI PHÍ GIÁN TIẾP</div>
+        <div class="value" id="sumIndirect">0 đ</div>
+      </div>
+      <div class="sum-card total">
+        <div class="label" id="labelTotal">TỔNG LỖ ƯỚC TÍNH</div>
+        <div class="value" id="sumTotal">0 đ</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab(1)">Chi phí trực tiếp</button>
+      <button class="tab-btn" onclick="showTab(2)">Chi phí gián tiếp</button>
+    </div>
+
+    <!-- ============ TAB 1 ============ -->
+    <div class="tab-content active" id="tab1">
+
+      <div class="party-block nt" id="ntBlock1">
+        <div class="party-header nt-header">🏗️ NHÀ THẦU MỚI — khối lượng còn lại</div>
+
+        <div class="party-title chuatc">A. Hạng mục CHƯA THI CÔNG (0%)</div>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr><th>Hạng mục</th><th>Giá trị theo HĐ (= khối lượng nhận)</th><th>Giá trị theo CP thực tế</th><th>Lỗ ước tính (đ)</th></tr>
+            </thead>
+            <tbody id="tbodyChuaTC"></tbody>
+            <tfoot>
+              <tr><td>Tổng chưa thi công</td><td id="totalChuaTC_HD"></td><td id="totalChuaTC_New"></td><td class="total-loss" id="totalChuaTC_Loss"></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="party-title dangdo">B. Hạng mục DỞ DANG (thi công tiếp phần còn lại)</div>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr><th>Hạng mục</th><th>Giá trị theo HĐ</th><th>Đã thi công (Trọng Tín)</th><th>Còn lại (Nhà thầu mới làm tiếp)</th><th>Lỗ ước tính (đ)</th></tr>
+            </thead>
+            <tbody id="tbodyDangDo"></tbody>
+            <tfoot>
+              <tr><td>Tổng dở dang</td><td id="totalDangDo_HD"></td><td id="totalDangDo_Done"></td><td id="totalDangDo_Remain"></td><td class="total-loss" id="totalDangDo_Loss"></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="panel" style="background:#ffffff;">
+          <h3 style="margin-bottom:8px;">TỔNG LỖ TRỰC TIẾP — NHÀ THẦU MỚI (A + B)</h3>
+          <div class="ratio-note" style="font-size:13px; margin-bottom:6px;">Chưa thi công: <b id="subA">0</b> &nbsp;+&nbsp; Dở dang: <b id="subB">0</b></div>
+          <div style="font-size:22px; font-weight:800; color:#dc2626;" id="directGrandTotal">0 đ</div>
+        </div>
+      </div>
+
+      <div class="party-block tt" id="ttBlock1">
+        <div class="party-header tt-header">⚠️ TRỌNG TÍN — khối lượng đã thi công</div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr><th>Hạng mục</th><th>Giá trị TT thi công (theo ĐG HĐ)</th><th>Giá trị theo CP thực tế</th><th>Lỗ ước tính (đ)</th></tr>
+            </thead>
+            <tbody id="tbodyTT"></tbody>
+            <tfoot>
+              <tr><td>TỔNG CỘNG</td><td id="totalTT_HD"></td><td id="totalTT_New"></td><td class="total-loss" id="totalTT_Loss"></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="panel" style="background:#ffffff;">
+          <h3 style="margin-bottom:8px;">TỔNG LỖ TRỰC TIẾP — TRỌNG TÍN</h3>
+          <div style="font-size:22px; font-weight:800; color:#dc2626;" id="ttDirectGrandTotal">0 đ</div>
+        </div>
+      </div>
+
+      <div class="panel" id="grandBoth1" style="background:linear-gradient(135deg,#f1f5f9,#fef2f2); border:1px solid #dc2626; box-shadow:0 0 24px rgba(236,72,153,0.15);">
+        <h3 style="color:white; margin-bottom:6px;">TỔNG LỖ TRỰC TIẾP CẢ 2 NHÀ THẦU</h3>
+        <div style="font-size:24px; font-weight:800; color:#dc2626;" id="bothDirectGrandTotal">0 đ</div>
+      </div>
+    </div>
+
+    <!-- ============ TAB 2 ============ -->
+    <div class="tab-content" id="tab2">
+
+      <div class="party-block nt" id="ntBlock2">
+        <div class="party-header nt-header">🏗️ NHÀ THẦU MỚI — chi phí BCH mới (25/8/2026 → 31/12/2026)</div>
+
+        <div class="panel">
+          <h3>Mốc thời gian</h3>
+          <div class="input-grid cols2">
+            <div class="input-item"><label>Ngày Nhà thầu mới huy động BCH</label><input type="date" id="ngayBD" value="2026-08-25" oninput="calcAll()"></div>
+            <div class="input-item"><label>Ngày hoàn thành theo HĐ mới</label><input type="date" id="ngayHT" value="2026-12-31" oninput="calcAll()"></div>
+          </div>
+          <div class="month-box" id="monthBox"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Chi phí duy trì BCH công trường / tháng</h3>
+          <div class="input-grid">
+            <div class="input-item"><label>Lương cán bộ kỹ thuật (đ/tháng)</label><input type="text" inputmode="numeric" id="cpLuong" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Thuê nhà cho cán bộ (đ/tháng)</label><input type="text" inputmode="numeric" id="cpNha" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Điện, nước (đ/tháng)</label><input type="text" inputmode="numeric" id="cpDienNuoc" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+          </div>
+          <div class="input-grid" style="margin-top:10px;">
+            <div class="input-item"><label>Bảo vệ (đ/tháng)</label><input type="text" inputmode="numeric" id="cpBaoVe" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Cấp dưỡng (đ/tháng)</label><input type="text" inputmode="numeric" id="cpCapDuong" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Chi phí khác (đ/tháng)</label><input type="text" inputmode="numeric" id="cpKhac" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+          </div>
+          <div class="ratio-note">Tổng chi phí BCH/tháng: <b id="cpThangTotal">0 đ</b></div>
+        </div>
+
+        <div class="panel" style="background:#ffffff;">
+          <h3 style="margin-bottom:4px;">TỔNG CHI PHÍ GIÁN TIẾP — NHÀ THẦU MỚI</h3>
+          <div style="font-size:22px; font-weight:800; color:#dc2626;" id="indirectGrandTotal">0 đ</div>
+          <div class="ratio-note" id="indirectNote" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="footnote">
+          Khác với trường hợp Trọng Tín (chi phí gián tiếp "vượt" so với kế hoạch ban đầu), đây là toàn bộ chi phí BCH cho <b>trọn thời gian thi công mới</b> — chỉ là "lỗ" nếu khoản này chưa được tính vào đơn giá/giá trị HĐ mới khi đàm phán với CĐT.
+        </div>
+      </div>
+
+      <div class="party-block tt" id="ttBlock2">
+        <div class="party-header tt-header">⚠️ TRỌNG TÍN — chi phí gián tiếp vượt tiến độ</div>
+
+        <div class="panel">
+          <h3>Mốc thời gian</h3>
+          <div class="input-grid">
+            <div class="input-item"><label>Ngày thành lập BCH</label><input type="date" id="tt_ngayBCH" value="2025-06-01" oninput="calcAll()"></div>
+            <div class="input-item"><label>Ngày khởi công</label><input type="date" id="tt_ngayKC" value="2025-08-15" oninput="calcAll()"></div>
+            <div class="input-item"><label>Ngày tính toán (hiện tại)</label><input type="date" id="tt_ngayTT" value="2026-08-25" oninput="calcAll()"></div>
+          </div>
+          <div class="input-grid cols2" style="margin-top:10px;">
+            <div class="input-item"><label>Thời gian thi công theo HĐ gốc (tháng)</label><input type="number" id="tt_soThangHD" value="" placeholder="Chưa nhập" oninput="calcAll()"></div>
+            <div class="input-item"><label>Tính mốc bắt đầu từ</label>
+              <select id="tt_mocBatDau" onchange="calcAll()">
+                <option value="bch">Ngày thành lập BCH</option>
+                <option value="kc" selected>Ngày khởi công</option>
+              </select>
+            </div>
+          </div>
+          <div class="month-box" id="tt_monthBox"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Chi phí duy trì BCH công trường / tháng</h3>
+          <div class="input-grid">
+            <div class="input-item"><label>Lương cán bộ kỹ thuật (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpLuong" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Thuê nhà cho cán bộ (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpNha" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Điện, nước (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpDienNuoc" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+          </div>
+          <div class="input-grid" style="margin-top:10px;">
+            <div class="input-item"><label>Bảo vệ (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpBaoVe" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Cấp dưỡng (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpCapDuong" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+            <div class="input-item"><label>Chi phí khác (đ/tháng)</label><input type="text" inputmode="numeric" id="tt_cpKhac" value="0" onfocus="this.select()" oninput="formatMoneyInput(this)"></div>
+          </div>
+          <div class="ratio-note">Tổng chi phí BCH/tháng: <b id="tt_cpThangTotal">0 đ</b></div>
+        </div>
+
+        <div class="panel" style="background:#ffffff;">
+          <h3 style="margin-bottom:4px;">TỔNG LỖ GIÁN TIẾP — TRỌNG TÍN</h3>
+          <div style="font-size:22px; font-weight:800; color:#dc2626;" id="tt_indirectGrandTotal">0 đ</div>
+          <div class="ratio-note" id="tt_indirectNote" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="footnote">
+          Lỗ gián tiếp Trọng Tín chỉ có cơ sở nếu thời gian kéo dài <b>không do lỗi Trọng Tín</b> (CĐT chậm bàn giao mặt bằng/thiết kế/thanh toán...). Nếu do năng lực quản lý/tổ chức thi công của Trọng Tín, khoản này Trọng Tín phải tự chịu.
+        </div>
+      </div>
+
+      <div class="panel" id="grandBoth2" style="background:linear-gradient(135deg,#f1f5f9,#fef2f2); border:1px solid #dc2626; box-shadow:0 0 24px rgba(236,72,153,0.15);">
+        <h3 style="color:white; margin-bottom:6px;">TỔNG CHI PHÍ/LỖ GIÁN TIẾP CẢ 2 NHÀ THẦU</h3>
+        <div style="font-size:24px; font-weight:800; color:#dc2626;" id="bothIndirectGrandTotal">0 đ</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function fmt(n) { return Math.round(n).toLocaleString('vi-VN'); }
+
+const CP_PAIR = {
+  cpLuong: 'tt_cpLuong', tt_cpLuong: 'cpLuong',
+  cpNha: 'tt_cpNha', tt_cpNha: 'cpNha',
+  cpDienNuoc: 'tt_cpDienNuoc', tt_cpDienNuoc: 'cpDienNuoc',
+  cpBaoVe: 'tt_cpBaoVe', tt_cpBaoVe: 'cpBaoVe',
+  cpCapDuong: 'tt_cpCapDuong', tt_cpCapDuong: 'cpCapDuong',
+  cpKhac: 'tt_cpKhac', tt_cpKhac: 'cpKhac',
+};
+
+function formatMoneyInput(el) {
+  let digits = el.value.replace(/\D/g, '');
+  const pairId = CP_PAIR[el.id];
+  if (digits === '') {
+    el.value = '';
+    if (pairId) document.getElementById(pairId).value = '';
+    calcAll();
+    return;
+  }
+  digits = digits.replace(/^0+(?=\d)/, '');
+  el.value = Number(digits).toLocaleString('vi-VN');
+  if (pairId) document.getElementById(pairId).value = el.value;
+  calcAll();
+}
+
+let ratioOrder = ['rvl', 'rnc', 'rmay'];
+
+function onRatioInput(id) {
+  ratioOrder = ratioOrder.filter(x => x !== id);
+  ratioOrder.push(id);
+  const autoField = ratioOrder[0];
+  const others = ratioOrder.slice(1);
+  const sumOthers = others.reduce((s, fid) => s + (parseFloat(document.getElementById(fid).value) || 0), 0);
+  let autoVal = Math.round((100 - sumOthers) * 100) / 100;
+  document.getElementById(autoField).value = autoVal;
+  calcAll();
+}
+
+function rawNum(id) {
+  const v = document.getElementById(id).value.replace(/\D/g, '');
+  return v === '' ? 0 : parseFloat(v);
+}
+
+const DAT_TONG_KL = 64934.9;
+const DAT_TONG_TIEN_TT = 10281678840;
+
+const groups = [
+  ["I. Giao thông", 23957233328, 5715062964],
+  ["II. Cấp nước", 1064565380, 0],
+  ["III. PCCC", 209359618, 0],
+  ["IV. San nền", 5373010516, 5759913267],
+  ["V. Thoát nước mưa", 5052583610, 2566864049],
+  ["VI. Thoát nước thải", 1663057378, 1036924139],
+  ["VII. Rãnh kỹ thuật", 1687884978, 36141913],
+  ["VIII. Cống ngang + cống chéo", 2313068719, 1863283631],
+  ["IX. Khuôn viên", 2598996439, 0],
+  ["X. Đường dây trung áp 22kV + thí nghiệm", 2087387543, 139048103],
+  ["XI. Trạm biến áp", 200841254, 0],
+  ["XII. Điện hạ thế sinh hoạt", 2979292696, 120662401],
+  ["XIII. Điện chiếu sáng", 2007058125, 56383565],
+  ["XIV. Tháo dỡ đường dây", 11820590, 0],
+  ["XV. Thông tin liên lạc", 759603044, 0],
+  ["B. Chi phí thiết bị", 2038841342, 0],
+];
+
+function showTab(n) {
+  document.getElementById('tab1').classList.toggle('active', n===1);
+  document.getElementById('tab2').classList.toggle('active', n===2);
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===n-1));
+}
+
+function onKClassChange() {
+  const dgHD = parseFloat(document.getElementById('kClass').value);
+  const tongTienHD = DAT_TONG_KL * dgHD;
+  const tyLe = (DAT_TONG_TIEN_TT/tongTienHD - 1) * 100;
+  document.getElementById('x1').value = tyLe.toFixed(2);
+  calcAll();
+}
+
+function calcDirect() {
+  const dgHD = parseFloat(document.getElementById('kClass').value);
+  const tongTienHD = DAT_TONG_KL * dgHD;
+  const tyLeAuto = (DAT_TONG_TIEN_TT/tongTienHD - 1) * 100;
+  document.getElementById('ratioAuto').textContent = tyLeAuto.toFixed(2).replace('.',',') + '%';
+
+  const x1 = parseFloat(document.getElementById('x1').value)/100 || 0;
+  const x2 = parseFloat(document.getElementById('x2').value)/100 || 0;
+  const x3 = parseFloat(document.getElementById('x3').value)/100 || 0;
+  const rvl = parseFloat(document.getElementById('rvl').value) || 0;
+  const rnc = parseFloat(document.getElementById('rnc').value) || 0;
+  const rmay = parseFloat(document.getElementById('rmay').value) || 0;
+  const ratioSum = rvl+rnc+rmay;
+
+  const note = document.getElementById('ratioNote');
+  if (Math.abs(ratioSum-100) > 0.01) {
+    note.innerHTML = `<span class="ratio-warn">⚠ Tổng = ${ratioSum}% (phải = 100%)</span>`;
+  } else {
+    note.innerHTML = `<span class="ratio-ok">✓ Tổng tỷ trọng = 100%</span>`;
+  }
+  const weightedPct = (rvl/100)*x1 + (rnc/100)*x2 + (rmay/100)*x3;
+  const pctStr = (weightedPct*100).toFixed(2)+'%';
+  document.getElementById('weightedPctShow').textContent = pctStr.replace('.',',');
+
+  let rowsA = "", hdA=0, newA=0, lossA=0;
+  groups.filter(([n,hd,done]) => done === 0).forEach(([name, hd, done]) => {
+    const remain = hd;
+    const newVal = remain*(1+weightedPct);
+    const loss = newVal-remain;
+    hdA += remain; newA += newVal; lossA += loss;
+    rowsA += `<tr><td>${name}</td><td>${fmt(remain)}</td><td>${fmt(newVal)}</td><td class="loss-cell">${fmt(loss)}</td></tr>`;
+  });
+  document.getElementById('tbodyChuaTC').innerHTML = rowsA;
+  document.getElementById('totalChuaTC_HD').textContent = fmt(hdA);
+  document.getElementById('totalChuaTC_New').textContent = fmt(newA);
+  document.getElementById('totalChuaTC_Loss').textContent = fmt(lossA);
+
+  let rowsB = "", hdB=0, doneB=0, remainB=0, lossB=0;
+  groups.filter(([n,hd,done]) => done > 0 && (hd-done) > 0).forEach(([name, hd, done]) => {
+    const remain = hd-done;
+    const loss = remain*weightedPct;
+    hdB+=hd; doneB+=done; remainB+=remain; lossB+=loss;
+    rowsB += `<tr><td>${name}</td><td>${fmt(hd)}</td><td>${fmt(done)}</td><td>${fmt(remain)}</td><td class="loss-cell">${fmt(loss)}</td></tr>`;
+  });
+  document.getElementById('tbodyDangDo').innerHTML = rowsB;
+  document.getElementById('totalDangDo_HD').textContent = fmt(hdB);
+  document.getElementById('totalDangDo_Done').textContent = fmt(doneB);
+  document.getElementById('totalDangDo_Remain').textContent = fmt(remainB);
+  document.getElementById('totalDangDo_Loss').textContent = fmt(lossB);
+
+  const lossTotal = lossA + lossB;
+  document.getElementById('subA').textContent = fmt(lossA);
+  document.getElementById('subB').textContent = fmt(lossB);
+  document.getElementById('directGrandTotal').textContent = fmt(lossTotal) + ' đ';
+
+  // ===== TRỌNG TÍN — khối lượng đã thi công (dùng chung weightedPct) =====
+  let rowsTT = "", hdTT=0, newTT=0, lossTT=0;
+  groups.forEach(([name, hd, done]) => {
+    const base = done;
+    const newVal = base*(1+weightedPct);
+    const loss = newVal-base;
+    hdTT += base; newTT += newVal; lossTT += loss;
+    rowsTT += `<tr><td>${name}</td><td>${fmt(base)}</td><td>${fmt(newVal)}</td><td class="loss-cell">${base>0?fmt(loss):'0'}</td></tr>`;
+  });
+  document.getElementById('tbodyTT').innerHTML = rowsTT;
+  document.getElementById('totalTT_HD').textContent = fmt(hdTT);
+  document.getElementById('totalTT_New').textContent = fmt(newTT);
+  document.getElementById('totalTT_Loss').textContent = fmt(lossTT)+' đ';
+  document.getElementById('ttDirectGrandTotal').textContent = fmt(lossTT) + ' đ';
+
+  document.getElementById('bothDirectGrandTotal').textContent = fmt(lossTotal + lossTT) + ' đ';
+
+  return { nt: lossTotal, tt: lossTT };
+}
+
+function monthsBetween(d1, d2) {
+  let months = (d2.getFullYear()-d1.getFullYear())*12 + (d2.getMonth()-d1.getMonth());
+  months += (d2.getDate()-d1.getDate())/30;
+  return months;
+}
+
+function calcIndirectNT() {
+  const ngayBD = new Date(document.getElementById('ngayBD').value);
+  const ngayHT = new Date(document.getElementById('ngayHT').value);
+  const soThang = Math.max(0, monthsBetween(ngayBD, ngayHT));
+
+  document.getElementById('monthBox').innerHTML = `Thời gian thi công dự kiến: <b>${soThang.toFixed(1)} tháng</b>`;
+
+  const cp = ['cpLuong','cpNha','cpDienNuoc','cpBaoVe','cpCapDuong','cpKhac']
+    .map(id => rawNum(id))
+    .reduce((a,b)=>a+b, 0);
+  document.getElementById('cpThangTotal').textContent = fmt(cp) + " đ";
+
+  const total = soThang * cp;
+  document.getElementById('indirectGrandTotal').textContent = fmt(total) + " đ";
+  document.getElementById('indirectNote').innerHTML = `${soThang.toFixed(1)} tháng × ${fmt(cp)} đ/tháng = <b>${fmt(total)} đ</b>`;
+  return total;
+}
+
+function calcIndirectTT() {
+  const ngayBCH = new Date(document.getElementById('tt_ngayBCH').value);
+  const ngayKC = new Date(document.getElementById('tt_ngayKC').value);
+  const ngayTT = new Date(document.getElementById('tt_ngayTT').value);
+  const mocBD = document.getElementById('tt_mocBatDau').value;
+  const startDate = mocBD==='bch' ? ngayBCH : ngayKC;
+  const soThangThucTe = monthsBetween(startDate, ngayTT);
+
+  document.getElementById('tt_monthBox').innerHTML = `Số tháng BCH đã hoạt động thực tế: <b>${soThangThucTe.toFixed(1)} tháng</b>`;
+
+  const cp = ['tt_cpLuong','tt_cpNha','tt_cpDienNuoc','tt_cpBaoVe','tt_cpCapDuong','tt_cpKhac']
+    .map(id => rawNum(id))
+    .reduce((a,b)=>a+b, 0);
+  document.getElementById('tt_cpThangTotal').textContent = fmt(cp) + ' đ';
+
+  const soThangHDraw = document.getElementById('tt_soThangHD').value;
+  const soThangHD = parseFloat(soThangHDraw);
+  const hasHD = soThangHDraw !== "" && !isNaN(soThangHD);
+  const note = document.getElementById('tt_indirectNote');
+  let loss = 0;
+  if (!hasHD) {
+    note.innerHTML = `<span class="ratio-warn">⚠ Chưa nhập thời gian thi công theo HĐ gốc.</span>`;
+  } else {
+    const vuot = soThangThucTe - soThangHD;
+    if (vuot > 0) {
+      loss = vuot * cp;
+      note.innerHTML = `Vượt: <b>${vuot.toFixed(1)} tháng</b> × ${fmt(cp)} đ = <b>${fmt(loss)} đ</b>`;
+    } else {
+      note.innerHTML = `Chưa vượt tiến độ theo HĐ — lỗ gián tiếp = 0.`;
+    }
+  }
+  document.getElementById('tt_indirectGrandTotal').textContent = fmt(loss) + ' đ';
+  return loss;
+}
+
+let currentParty = 'both';
+
+function setParty(p) {
+  currentParty = p;
+  document.querySelectorAll('.party-tree-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tree-' + p).classList.add('active');
+  document.querySelectorAll('.party-block.nt').forEach(el => el.style.display = (p==='both'||p==='nt') ? '' : 'none');
+  document.querySelectorAll('.party-block.tt').forEach(el => el.style.display = (p==='both'||p==='tt') ? '' : 'none');
+  document.getElementById('grandBoth1').style.display = (p==='both') ? '' : 'none';
+  document.getElementById('grandBoth2').style.display = (p==='both') ? '' : 'none';
+  updateSummary();
+}
+
+function showSidePanel(name) {
+  document.querySelectorAll('.rail-icon').forEach(el => el.classList.toggle('active', el.dataset.panel === name));
+  document.querySelectorAll('.sidebar-panel').forEach(el => el.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function jumpTo(tabNum) {
+  showTab(tabNum);
+  document.querySelector('.tabs').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+let lastNumbers = { ntD:0, ttD:0, ntI:0, ttI:0 };
+
+function updateSummary() {
+  const labels = {
+    both: ['LỖ TRỰC TIẾP (CẢ 2)', 'LỖ/CHI PHÍ GIÁN TIẾP (CẢ 2)', 'TỔNG LỖ CẢ DỰ ÁN'],
+    nt: ['LỖ TRỰC TIẾP — NHÀ THẦU MỚI', 'CHI PHÍ GIÁN TIẾP — NHÀ THẦU MỚI', 'TỔNG — NHÀ THẦU MỚI'],
+    tt: ['LỖ TRỰC TIẾP — TRỌNG TÍN', 'LỖ GIÁN TIẾP — TRỌNG TÍN', 'TỔNG — TRỌNG TÍN'],
+  };
+  const [l1,l2,l3] = labels[currentParty];
+  document.getElementById('labelDirect').textContent = l1;
+  document.getElementById('labelIndirect').textContent = l2;
+  document.getElementById('labelTotal').textContent = l3;
+
+  let d=0, i=0;
+  if (currentParty==='both') { d = lastNumbers.ntD+lastNumbers.ttD; i = lastNumbers.ntI+lastNumbers.ttI; }
+  else if (currentParty==='nt') { d = lastNumbers.ntD; i = lastNumbers.ntI; }
+  else { d = lastNumbers.ttD; i = lastNumbers.ttI; }
+
+  document.getElementById('sumDirect').textContent = fmt(d) + " đ";
+  document.getElementById('sumIndirect').textContent = fmt(i) + " đ";
+  document.getElementById('sumTotal').textContent = fmt(d+i) + " đ";
+
+  document.getElementById('sumDirect').style.color = d > 0 ? '#dc2626' : '';
+  document.getElementById('sumIndirect').style.color = i > 0 ? '#dc2626' : '';
+  const totalEl = document.getElementById('sumTotal');
+  totalEl.style.color = (d+i) > 0 ? '#dc2626' : '';
+}
+
+function calcAll() {
+  const dRes = calcDirect();
+  const ntI = calcIndirectNT();
+  const ttI = calcIndirectTT();
+
+  lastNumbers = { ntD: dRes.nt, ttD: dRes.tt, ntI: ntI, ttI: ttI };
+
+  document.getElementById('bothIndirectGrandTotal').textContent = fmt(ntI+ttI) + ' đ';
+
+  updateSummary();
+}
+
+calcAll();
+setParty('both');
+</script>
+</body>
+</html>

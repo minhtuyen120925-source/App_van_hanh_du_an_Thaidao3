@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light" data-tone="bh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thư viện Báo cáo gửi CQNN – Dự án Thái Đào 3</title>
+<style>
+  :root{
+    --navy:#0f2a4a; --navy2:#123a63; --blue:#2563eb; --blue-light:#eef4ff;
+    --green:#15803d; --green-bg:#e8f7ee;
+    --amber:#b45309; --amber-bg:#fef3e0;
+    --gray:#475569; --gray-bg:#eef1f5;
+    --red:#b91c1c; --red-bg:#fde8e8;
+    --border:#e2e8f0; --text:#1e293b; --muted:#64748b; --bg:#f6f8fb;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 28px;}
+  header h1{margin:0;font-size:1.35rem;font-weight:700;}
+  header p{margin:4px 0 0;font-size:.85rem;color:#cfe0f5;}
+  .container{max-width:1280px;margin:0 auto;padding:20px 20px 60px;}
+
+  /* Portal quick-access */
+  #portal-section{margin-bottom:18px;}
+  .portal-title{font-size:.85rem;font-weight:700;color:var(--navy2);margin-bottom:8px;}
+  #portalLinks{display:flex;flex-wrap:wrap;gap:12px;}
+  .portal-btn{flex:1 1 320px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#eef4ff,#ffffff);border:1px solid #c7dbfb;border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:box-shadow .15s,transform .15s;}
+  .portal-btn:hover{box-shadow:0 4px 14px rgba(37,99,235,.18);transform:translateY(-1px);}
+  .portal-ico{font-size:1.5rem;}
+  .portal-name{display:block;font-weight:700;color:var(--navy2);font-size:.92rem;}
+  .portal-sub{display:block;font-size:.76rem;color:var(--muted);margin-top:2px;}
+  .drive-note{font-size:.78rem;color:var(--muted);margin-bottom:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+
+  /* Deadline banner */
+  #deadlines{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+  .dl-card{flex:1 1 260px;border-radius:10px;padding:12px 16px;border:1px solid var(--border);background:#fff;display:flex;flex-direction:column;gap:4px;}
+  .dl-card.urgent{border-color:var(--red);background:var(--red-bg);}
+  .dl-card.soon{border-color:var(--amber);background:var(--amber-bg);}
+  .dl-card.ok{border-color:var(--green);background:var(--green-bg);}
+  .dl-card .dl-label{font-weight:600;font-size:.9rem;}
+  .dl-card .dl-meta{font-size:.8rem;color:var(--muted);}
+  .dl-card .dl-days{font-size:1.1rem;font-weight:700;}
+  .dl-card.urgent .dl-days{color:var(--red);}
+  .dl-card.soon .dl-days{color:var(--amber);}
+  .dl-card.ok .dl-days{color:var(--green);}
+
+  /* Stat cards */
+  #stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .stat-card .num{font-size:1.7rem;font-weight:700;}
+  .stat-card .lbl{font-size:.82rem;color:var(--muted);margin-top:2px;}
+  .stat-card.total .num{color:var(--navy);}
+  .stat-card.du .num{color:var(--green);}
+  .stat-card.thieu .num{color:var(--amber);}
+  .stat-card.scan .num{color:var(--gray);}
+
+  /* Toolbar */
+  #toolbar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  #toolbar input[type=text]{flex:1 1 220px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;}
+  #toolbar select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;background:#fff;}
+  .btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;}
+  .btn:hover{background:var(--gray-bg);}
+  .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .btn-primary:hover{background:#1d4ed8;}
+  .btn-ghost{background:transparent;border:none;color:var(--blue);}
+  .btn-sm{padding:4px 9px;font-size:.78rem;border-radius:6px;}
+  .spacer{flex:1 1 auto;}
+
+  /* Table */
+  #table-wrap{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:960px;}
+  thead th{background:var(--blue-light);text-align:left;padding:10px 12px;font-weight:700;color:var(--navy2);border-bottom:2px solid var(--border);position:sticky;top:0;cursor:pointer;user-select:none;}
+  thead th.nosort{cursor:default;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  tbody tr:hover{background:#fafbfd;}
+  .grp-row td{background:var(--navy);color:#fff;font-weight:700;padding:8px 12px;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.74rem;font-weight:700;}
+  .badge.du{background:var(--green-bg);color:var(--green);}
+  .badge.thieu_ky{background:var(--amber-bg);color:var(--amber);}
+  .badge.chi_co_scan{background:var(--gray-bg);color:var(--gray);}
+  .badge.khac{background:var(--gray-bg);color:var(--gray);}
+  .path{font-size:.76rem;color:var(--muted);word-break:break-word;}
+  .filetag{display:inline-block;font-size:.72rem;padding:1px 6px;border-radius:5px;background:#eef1f5;color:#334155;margin:1px 3px 1px 0;border:1px solid var(--border);}
+  .filetag.up{background:#e6f0ff;color:var(--blue);border-color:#c7dbfb;}
+  .dl-box{display:inline-block;}
+  .dl-box .dl-title{font-size:.68rem;font-weight:700;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+  .dl-btns{display:flex;flex-wrap:wrap;gap:8px;}
+  a.dl-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;border:1px solid #bcd3fb;background:#eef4ff;color:var(--blue);font-size:.78rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .15s,box-shadow .15s;}
+  a.dl-pill:hover{background:#dce9ff;box-shadow:0 2px 6px rgba(37,99,235,.15);}
+  a.dl-pill .dl-arrow{font-size:.8rem;}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .empty-row td{text-align:center;padding:30px;color:var(--muted);}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:22px 24px;}
+  .modal h2{margin:0 0 14px;font-size:1.1rem;color:var(--navy);}
+  .modal label{display:block;font-size:.82rem;font-weight:600;margin:10px 0 4px;color:#334155;}
+  .modal input[type=text],.modal input[type=number],.modal input[type=file],.modal select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:.86rem;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+  .modal .hint{font-size:.76rem;color:var(--muted);margin-top:4px;}
+  .attach-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+  .attach-item{display:flex;justify-content:space-between;align-items:center;background:var(--gray-bg);padding:6px 10px;border-radius:7px;font-size:.8rem;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding:20px;}
+  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:8px;font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:100;}
+  #toast.show{opacity:1;}
+  .count-tag{font-size:.78rem;color:var(--muted);}
+  @media (max-width:640px){
+    header{padding:16px;}
+    .container{padding:14px;}
+  }
+</style>
+<style id="bh-theme">
+/* ============ BH-THEME v1 — đồng nhất với Dashboard tổng ============ */
+:root{--bh-navy:#0f2a4a;--bh-navy2:#153b66;--bh-blue:#1e63b3;--bh-sky:#e8f1fb;--bh-bg:#f4f7fb;
+--bh-card:#fff;--bh-line:#e2e8f0;--bh-ink:#1e293b;--bh-gray:#64748b;--bh-orange:#f59e0b;
+--bh-green:#16a34a;--bh-red:#dc2626;--bh-purple:#7c3aed;--bh-teal:#0d9488;}
+html{color-scheme:light !important;}
+html,body{font-family:"Segoe UI",Roboto,Arial,sans-serif !important;font-size:14px !important;
+  line-height:1.5 !important;background:#f4f7fb !important;color:#1e293b !important;}
+*{font-family:inherit !important;text-shadow:none !important;}
+h1{font-size:20px !important;font-weight:800 !important;letter-spacing:.3px !important;}
+h2{font-size:16px !important;font-weight:700 !important;color:#0f2a4a !important;}
+h3{font-size:13.5px !important;font-weight:700 !important;color:#153b66 !important;letter-spacing:0 !important;}
+a{color:#1e63b3 !important;}
+p,li,label,span,div{letter-spacing:0 !important;}
+button{font-size:13px !important;font-weight:600 !important;border-radius:8px !important;cursor:pointer;}
+input,select,textarea{font-size:13px !important;border-radius:8px !important;background:#fff !important;
+  color:#1e293b !important;border:1px solid #e2e8f0 !important;}
+table{border-collapse:collapse !important;font-size:13px !important;font-variant-numeric:tabular-nums;}
+th{background:#0f2a4a !important;color:#fff !important;font-weight:600 !important;
+  border-color:#1c3f68 !important;}
+td{border-bottom:1px solid #e2e8f0 !important;}
+tbody tr:hover{background:#e8f1fb !important;}
+[class*="card"],[class*="panel"],[class*="box"],[id*="wrap"]{border-radius:12px !important;}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#c9d6e5;border-radius:6px}
+::-webkit-scrollbar-track{background:#eef2f7}
+.bh-hero{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;color:#fff !important;
+  border-radius:12px !important;padding:14px 20px !important;margin-bottom:18px !important;
+  box-shadow:0 2px 8px rgba(15,42,74,.18) !important;border:none !important;}
+.bh-hero h1,.bh-hero h2,.bh-hero p,.bh-hero span,.bh-hero div{color:#fff !important;}
+
+:root{--navy:#0f2a4a !important;--navy2:#153b66 !important;--blue:#1e63b3 !important;
+ --blue-light:#e8f1fb !important;--green:#16a34a !important;--amber:#f59e0b !important;
+ --gray:#64748b !important;--red:#dc2626 !important;--border:#e2e8f0 !important;
+ --text:#1e293b !important;--muted:#64748b !important;--bg:#f4f7fb !important;}
+header{background:linear-gradient(120deg,#0f2a4a,#153b66) !important;padding:14px 24px !important;}
+header h1{color:#fff !important;font-size:19px !important;}
+header p{color:#cfe0f5 !important;font-size:12px !important;}
+.container{max-width:1400px !important;padding:18px 22px 50px !important;}
+thead th{background:#0f2a4a !important;color:#fff !important;}
+.stat-card .num{font-size:19px !important;color:#0f2a4a !important;}
+.stat-card .lbl{font-size:12.5px !important;color:#64748b !important;}
+.btn-primary{background:#1e63b3 !important;border-color:#1e63b3 !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Thư viện Báo cáo gửi Cơ quan Nhà nước – Dự án KĐT Thái Đào 3</h1>
+  <p>Quản lý, theo dõi tình trạng hồ sơ và đường dẫn lưu trữ các báo cáo định kỳ / đột xuất gửi CQNN</p>
+</header>
+
+<div class="container">
+
+  <section id="portal-section">
+    <div class="portal-title">🌐 Cổng nộp báo cáo trực tuyến — bấm vào để mở trang, thao tác tải tài liệu lên trực tiếp</div>
+    <div id="portalLinks">
+      <a class="portal-btn" href="https://vpsxdbacninh.online/login.php" target="_blank" rel="noopener">
+        <span class="portal-ico">📤</span>
+        <span>
+          <span class="portal-name">Báo cáo tháng gửi Sở Xây dựng Bắc Ninh</span>
+          <span class="portal-sub">vpsxdbacninh.online — bấm vào đây để đăng nhập &amp; nộp báo cáo</span>
+        </span>
+      </a>
+      <a class="portal-btn" href="https://giamsatdautuquocgia.mof.gov.vn/Pages/default.aspx" target="_blank" rel="noopener">
+        <span class="portal-ico">📤</span>
+        <span>
+          <span class="portal-name">Báo cáo giám sát, đánh giá đầu tư — Bộ Tài chính</span>
+          <span class="portal-sub">giamsatdautuquocgia.mof.gov.vn — bấm vào đây để đăng nhập &amp; nộp báo cáo</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section id="deadlines"></section>
+
+  <section id="stats"></section>
+
+  <section id="toolbar">
+    <input type="text" id="searchBox" placeholder="🔍 Tìm theo tên báo cáo, kỳ, năm...">
+    <select id="filterNhom"><option value="">-- Nhóm / Loại báo cáo --</option></select>
+    <select id="filterNam"><option value="">-- Năm --</option></select>
+    <select id="filterChuKy"><option value="">-- Chu kỳ --</option></select>
+    <select id="filterTrangThai"><option value="">-- Trạng thái --</option></select>
+    <button class="btn" id="btnClearFilter">Xóa lọc</button>
+    <div class="spacer"></div>
+    <button class="btn" id="btnExport">⬇ Xuất dữ liệu (JSON)</button>
+    <button class="btn" id="btnImportTrigger">⬆ Nhập dữ liệu</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+    <button class="btn btn-primary" id="btnAddReport">+ Thêm báo cáo</button>
+  </section>
+
+  <div style="margin-bottom:8px;" class="count-tag" id="resultCount"></div>
+  <div class="drive-note">ℹ️ Link tải file gốc trỏ thẳng tới Google Drive (đã sắp xếp lại theo cấu trúc mới). File hiện chỉ mở được khi bạn đăng nhập đúng tài khoản Google có quyền xem — nếu người khác bấm vào bị chặn, báo Sếp Tuyền để cấp quyền chia sẻ.</div>
+
+  <section id="table-wrap">
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th data-sort="stt" class="nosort">STT</th>
+          <th data-sort="ten_file_goc">Tên báo cáo</th>
+          <th class="nosort">Tải tài liệu</th>
+          <th class="nosort">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </section>
+
+  <footer>
+    Thư viện báo cáo nội bộ – Dự án KĐT Thái Đào 3 · Dữ liệu lưu trên máy này (IndexedDB/localStorage), không đồng bộ online.<br>
+    Tổng hợp bởi Chú Vượng · Cập nhật lần cuối khi tạo file: <span id="genDate"></span>
+  </footer>
+</div>
+
+<!-- Modal: Thêm / Sửa báo cáo -->
+<div class="modal-overlay" id="modalAdd">
+  <div class="modal">
+    <h2 id="modalAddTitle">+ Thêm báo cáo mới</h2>
+    <input type="hidden" id="editId">
+    <label>Tên báo cáo *</label>
+    <input type="text" id="fTen" placeholder="VD: BC_2026_thang_09_Phieu_gia_tri_XD">
+    <label>Nhóm / loại báo cáo *</label>
+    <select id="fNhom"></select>
+    <label>Năm *</label>
+    <input type="number" id="fNam" placeholder="2026">
+    <label>Kỳ báo cáo (nhãn hiển thị) *</label>
+    <input type="text" id="fKy" placeholder="VD: Tháng 09/2026 hoặc Quý III/2026">
+    <label>Trạng thái hồ sơ *</label>
+    <select id="fTrangThai">
+      <option value="du">Đủ hồ sơ (có bản gốc + bản ký/scan)</option>
+      <option value="thieu_ky">Thiếu bản ký/scan</option>
+      <option value="chi_co_scan">Chỉ có bản scan</option>
+      <option value="khac">Khác</option>
+    </select>
+    <label>Ghi chú vị trí lưu trữ (tùy chọn)</label>
+    <input type="text" id="fViTri" placeholder="VD: 1_Dinh_ky/1.1_Thang/...">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalAdd')">Hủy</button>
+      <button class="btn btn-primary" id="btnSaveReport">Lưu báo cáo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Đính kèm file -->
+<div class="modal-overlay" id="modalUpload">
+  <div class="modal">
+    <h2>Đính kèm file cho báo cáo</h2>
+    <p id="uploadReportName" style="font-weight:600;color:var(--navy2);"></p>
+    <label>Chọn file từ máy tính</label>
+    <input type="file" id="uploadFileInput" multiple>
+    <p class="hint">File sẽ được lưu trong trình duyệt (IndexedDB) trên máy này, gắn liền với báo cáo. Không tải lên server nào.</p>
+    <div class="attach-list" id="attachList"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalUpload')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   DỮ LIỆU GỐC (63 báo cáo đã rà soát từ thư mục _bao_cao, mỗi báo cáo chỉ giữ version mới nhất)
+   ========================================================= */
+const REPORTS_DATA = [
+  {
+    "id": 1,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2026,
+    "ky_label": "Tháng 01/2026",
+    "sort_key": 202601,
+    "ten_file_goc": "BC_2026_thang_01_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33764,
+        "fname": "BC_2026_thang_01_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_thang_01_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1HMiUymoFfGnu08e0HV0-QVS0-aTnIsrB"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026"
+  },
+  {
+    "id": 2,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Tháng 08/2025",
+    "sort_key": 202508,
+    "ten_file_goc": "BC_2025_thang_08_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 31892,
+        "fname": "BC_2025_thang_08_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_thang_08_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1jCF0ibBRvMXhCBxAy8VaYKs-yuWxsjty"
+      },
+      {
+        "ext": "pdf",
+        "size": 1794300,
+        "fname": "BC_2025_thang_08_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_thang_08_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "drive_file_id": "1AakPOUXORRZXrp2vO0WObPSWvOwykznD"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 3,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Tháng 04/2025",
+    "sort_key": 202504,
+    "ten_file_goc": "BC_2025_thang_04_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27724,
+        "fname": "BC_2025_thang_04_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_thang_04_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1-fHFIt6wn4JhU_6QUqygm22_jfolp0O5"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 4,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Tháng 01/2025",
+    "sort_key": 202501,
+    "ten_file_goc": "BC_2025_thang_01_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27912,
+        "fname": "BC_2025_thang_01_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_thang_01_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1tIO2XJbb8suYwQfDjq9awu9yVCcDQ7ie"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 5,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2026,
+    "ky_label": "Quý II/2026",
+    "sort_key": 20262,
+    "ten_file_goc": "BC_2026_Quy_II_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28965,
+        "fname": "BC_2026_Quy_II_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_Quy_II_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1NVj3YS9oM-ZLb8727D71h0B8IqFt9lcy"
+      },
+      {
+        "ext": "pdf",
+        "size": 1368583,
+        "fname": "BC_2026_Quy_II_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_Quy_II_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1qIupwwwaXpMT1Izr-BIyuYOZ6mE0uUiO"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026"
+  },
+  {
+    "id": 6,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2026,
+    "ky_label": "Quý I/2026",
+    "sort_key": 20261,
+    "ten_file_goc": "BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 86528,
+        "fname": "BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.doc",
+        "drive_file_id": "119Gayqc-bVwL_Yp12kJj3tKWWfVyEsen"
+      },
+      {
+        "ext": "pdf",
+        "size": 2178687,
+        "fname": "BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1aKcv2WDS8fS74zfu1c4xFYUoIdlO2AAV"
+      },
+      {
+        "ext": "xlsx",
+        "size": 35428,
+        "fname": "BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.xlsx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026/BC_2026_Quy_I_BC-tinh-hinh-trien-khai-DA.xlsx",
+        "drive_file_id": "1FQzESwSlC2D0u9tbczuRqSJGd2dHBBKA"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2026"
+  },
+  {
+    "id": 7,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Quý IV/2025",
+    "sort_key": 20254,
+    "ten_file_goc": "BC_2025_Quy_IV_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 3037265,
+        "fname": "BC_2025_Quy_IV_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_Quy_IV_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "drive_file_id": "1MMR5QWoMr5LcvLuahgdoJmogPXzFXo04"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 8,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Quý III/2025",
+    "sort_key": 20253,
+    "ten_file_goc": "BC_2025_Quy_III_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28939,
+        "fname": "BC_2025_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1KEcFJ6ak3Z3jgJ6VLoco5LAENzjAssaG"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 9,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Quý II/2025",
+    "sort_key": 20252,
+    "ten_file_goc": "BC_2025_Quy_II_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 29090,
+        "fname": "BC_2025_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1_oAYdAXoYR5Zs5MMbk5ysX-atcY3A7ya"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 10,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2025,
+    "ky_label": "Quý I/2025",
+    "sort_key": 20251,
+    "ten_file_goc": "BC_2025_Quy_I_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 1471798,
+        "fname": "BC_2025_Quy_I_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025/BC_2025_Quy_I_BC-giam-sat-danh-gia-dau-tu.pdf",
+        "drive_file_id": "1FmiSTPi9u-e-qXy7uw1HxwBcEXjHY6uT"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2025"
+  },
+  {
+    "id": 11,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2024,
+    "ky_label": "Quý IV/2024",
+    "sort_key": 20244,
+    "ten_file_goc": "BC_2024_Quy_IV_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28128,
+        "fname": "BC_2024_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024/BC_2024_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "17CFiUin9y9VOsVs7-C4KeoHrUvUgCKTz"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024"
+  },
+  {
+    "id": 12,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2024,
+    "ky_label": "Quý III/2024",
+    "sort_key": 20243,
+    "ten_file_goc": "BC_2024_Quy_III_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28119,
+        "fname": "BC_2024_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024/BC_2024_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1l7EQqANs7MUIMdtloRi45UksY_IxX1uD"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024"
+  },
+  {
+    "id": 13,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2024,
+    "ky_label": "Quý II/2024",
+    "sort_key": 20242,
+    "ten_file_goc": "BC_2024_Quy_II_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28174,
+        "fname": "BC_2024_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024/BC_2024_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "108HNwfbtnBZYeOtAvr7C_z3ACHStK_Dc"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024"
+  },
+  {
+    "id": 14,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2024,
+    "ky_label": "Quý I/2024",
+    "sort_key": 20241,
+    "ten_file_goc": "BC_2024_Quy_I_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28360,
+        "fname": "BC_2024_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024/BC_2024_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1mUCcHKrPo3lMjjft3dG38ze5BH5hiozG"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2024"
+  },
+  {
+    "id": 15,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2023,
+    "ky_label": "Quý IV/2023",
+    "sort_key": 20234,
+    "ten_file_goc": "BC_2023_Quy_IV_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28044,
+        "fname": "BC_2023_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023/BC_2023_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1fpXZwBW2szm7nS2SR6hTfWSywr3ru7Al"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023"
+  },
+  {
+    "id": 16,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2023,
+    "ky_label": "Quý III/2023",
+    "sort_key": 20233,
+    "ten_file_goc": "BC_2023_Quy_III_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28064,
+        "fname": "BC_2023_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023/BC_2023_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1XXXE-y8z0LtwrQ-T1unJBRXutNjW0D_1"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023"
+  },
+  {
+    "id": 17,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2023,
+    "ky_label": "Quý II/2023",
+    "sort_key": 20232,
+    "ten_file_goc": "BC_2023_Quy_II_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28037,
+        "fname": "BC_2023_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023/BC_2023_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1axAzMV9AVYpcSmvTqHq9rXdosDNkdyZE"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023"
+  },
+  {
+    "id": 18,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2023,
+    "ky_label": "Quý I/2023",
+    "sort_key": 20231,
+    "ten_file_goc": "BC_2023_Quy_I_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27979,
+        "fname": "BC_2023_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023/BC_2023_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1EnXED1d_pPsv_hKmZFkUh-UZO83LihZG"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2023"
+  },
+  {
+    "id": 19,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2022,
+    "ky_label": "Quý IV/2022",
+    "sort_key": 20224,
+    "ten_file_goc": "BC_2022_Quy_IV_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 28024,
+        "fname": "BC_2022_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022/BC_2022_Quy_IV_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1pOf5mit9gzecMYCMie5eU3fH7CzPON_o"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022"
+  },
+  {
+    "id": 20,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2022,
+    "ky_label": "Quý III/2022",
+    "sort_key": 20223,
+    "ten_file_goc": "BC_2022_Quy_III_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27833,
+        "fname": "BC_2022_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022/BC_2022_Quy_III_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1dhSEtc_fO9JfhQLRRkvT33s6z82VXUt_"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022"
+  },
+  {
+    "id": 21,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2022,
+    "ky_label": "Quý II/2022",
+    "sort_key": 20222,
+    "ten_file_goc": "BC_2022_Quy_II_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27920,
+        "fname": "BC_2022_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022/BC_2022_Quy_II_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "1u75fE9mPKczK9OhvDdCwQYgmhUac6OiO"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022"
+  },
+  {
+    "id": 22,
+    "nhom": "giam_sat_dau_tu",
+    "nhom_label": "Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính",
+    "chu_ky": "quy",
+    "nam": 2022,
+    "ky_label": "Quý I/2022",
+    "sort_key": 20221,
+    "ten_file_goc": "BC_2022_Quy_I_BC-giam-sat-danh-gia-dau-tu",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27682,
+        "fname": "BC_2022_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022/BC_2022_Quy_I_BC-giam-sat-danh-gia-dau-tu.docx",
+        "drive_file_id": "124fGme98LBiQf-e0H_2NuBhcDU44lV16"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "5_Baocao_Quy_SoTC",
+    "thu_muc_moi": "1_Dinh_ky/1.2_Quy/SoTC_giam_sat_danh_gia_dau_tu/2022"
+  },
+  {
+    "id": 23,
+    "nhom": "ke_hoach_tien_do",
+    "nhom_label": "Kế hoạch tiến độ chi tiết gửi CQNN",
+    "chu_ky": "dot_xuat",
+    "nam": 2026,
+    "ky_label": "Không theo chu kỳ cố định",
+    "sort_key": 999999,
+    "ten_file_goc": "Báo cáo tiến độ chi tiết_gửi_CQNN (1)",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33940,
+        "fname": "Báo cáo tiến độ chi tiết_gửi_CQNN (1).docx",
+        "duong_dan_moi": "2_Dot_xuat/KH_tien_do_chi_tiet/Báo cáo tiến độ chi tiết_gửi_CQNN (1).docx",
+        "drive_file_id": "1d23q7ZmfDljeuCQzwJp5XNKamCrnnt6B"
+      },
+      {
+        "ext": "pdf",
+        "size": 1214889,
+        "fname": "Báo cáo tiến độ chi tiết_gửi_CQNN (1).pdf",
+        "duong_dan_moi": "2_Dot_xuat/KH_tien_do_chi_tiet/Báo cáo tiến độ chi tiết_gửi_CQNN (1).pdf",
+        "drive_file_id": "1sbr1XbbsJhXVoZqgcwCuE7-8ebOAkfZy"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "2_bao cao Tiến độ kế hoạch chi tiết",
+    "thu_muc_moi": "2_Dot_xuat/KH_tien_do_chi_tiet"
+  },
+  {
+    "id": 24,
+    "nhom": "phieu_gia_tri_xd",
+    "nhom_label": "Phiếu giá trị SXD tháng (thống kê)",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 09/2026",
+    "sort_key": 202609,
+    "ten_file_goc": "Phieu Chu dau tu-gia tri XD thang 9.2026 -Du an Thai Dao 3_rv1",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 91136,
+        "fname": "Phieu Chu dau tu-gia tri XD thang 9.2026 -Du an Thai Dao 3_rv1.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/Phieu_gia_tri_XD_ThongKe/Phieu Chu dau tu-gia tri XD thang 9.2026 -Du an Thai Dao 3_rv1.doc",
+        "drive_file_id": "1PiMbjah8J_b02VA_CEzJCZRJ9G08_GF9"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "3_baocao_qua_phiếu thu thập thông tin",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/Phieu_gia_tri_XD_ThongKe"
+  },
+  {
+    "id": 25,
+    "nhom": "phieu_gia_tri_xd",
+    "nhom_label": "Phiếu giá trị SXD tháng (thống kê)",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 08/2026",
+    "sort_key": 202608,
+    "ten_file_goc": "Phieu Chu dau tu-gia tri XD thang 8.2026 -Du an Thai Dao 3",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 87552,
+        "fname": "Phieu Chu dau tu-gia tri XD thang 8.2026 -Du an Thai Dao 3.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/Phieu_gia_tri_XD_ThongKe/Phieu Chu dau tu-gia tri XD thang 8.2026 -Du an Thai Dao 3.doc",
+        "drive_file_id": "1BKGqLrmJsw1-HJ10KhHg5PN4Ugz12lSg"
+      },
+      {
+        "ext": "pdf",
+        "size": 775343,
+        "fname": "Phieu Chu dau tu-gia tri XD thang 8.2026 -Du an Thai Dao 3.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/Phieu_gia_tri_XD_ThongKe/Phieu Chu dau tu-gia tri XD thang 8.2026 -Du an Thai Dao 3.pdf",
+        "drive_file_id": "1hl3Z_sUS1GyTepVpQu0H0jqL-tQaFMGO"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "3_baocao_qua_phiếu thu thập thông tin",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/Phieu_gia_tri_XD_ThongKe"
+  },
+  {
+    "id": 26,
+    "nhom": "soxd_qua_web",
+    "nhom_label": "Báo cáo tiến độ qua Cổng TT Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 07/2026 (ước tính theo tên file)",
+    "sort_key": 202607,
+    "ten_file_goc": "Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_draft",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 150129,
+        "fname": "Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_draft.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_qua_web/Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_draft.pdf",
+        "drive_file_id": "1omgmKuyEIV2DC_LqjVjlz1T5_bovGa2P"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "1_baocao_qua_web_sở XD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_qua_web"
+  },
+  {
+    "id": 27,
+    "nhom": "soxd_qua_web",
+    "nhom_label": "Báo cáo tiến độ qua Cổng TT Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 07/2026 (ước tính theo tên file)",
+    "sort_key": 202607,
+    "ten_file_goc": "Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_scan",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 771389,
+        "fname": "Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_scan.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_qua_web/Biểu mẫu Báo cáo Tiến độ - Khu đô thị số 3 xã Thái Đào_Thang7_scan.pdf",
+        "drive_file_id": "1s5F46CaJsZHRZK2IirdZM-0RzHyndQZN"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "1_baocao_qua_web_sở XD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_qua_web"
+  },
+  {
+    "id": 28,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 08/2026",
+    "sort_key": 202608,
+    "ten_file_goc": "BC_2026_thang_08_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32179,
+        "fname": "BC_2026_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1q8X23kUQkAjhuYTEV_8F1_Qts2erdNqh"
+      },
+      {
+        "ext": "pdf",
+        "size": 2213870,
+        "fname": "BC_2026_thang_08_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_08_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1tlzlO6eFQ560rJQIHRe4K1cgM9SdU1SP"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 29,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 07/2026",
+    "sort_key": 202607,
+    "ten_file_goc": "BC_2026_thang_07_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 31919,
+        "fname": "BC_2026_thang_07_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_07_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1a5UAOudJnA2Ul7biZuhTTdfonwtcEKcr"
+      },
+      {
+        "ext": "pdf",
+        "size": 2195871,
+        "fname": "BC_2026_thang_07_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_07_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1iIZ7n5R5qgeA9PadT8powvbptK9mnr_7"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 30,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 06/2026",
+    "sort_key": 202606,
+    "ten_file_goc": "BC_2026_thang_06_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32017,
+        "fname": "BC_2026_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1y4nF0-OfSPK5QYvI3fnktK7e2qT_XJtf"
+      },
+      {
+        "ext": "pdf",
+        "size": 1564055,
+        "fname": "BC_2026_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1kg0xkfsJ6mnBF0Rnh1omodfvnM8kFJKv"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 31,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 05/2026",
+    "sort_key": 202605,
+    "ten_file_goc": "BC_2026_thang_05_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32086,
+        "fname": "BC_2026_thang_05_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_05_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "10e9v8pDjV89g7_l_MnPX6UH2UBkxebSV"
+      },
+      {
+        "ext": "pdf",
+        "size": 2259861,
+        "fname": "BC_2026_thang_05_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_05_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1wbdb9QZNCI70fsjuf5Ot7sDJWH8kc2GA"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 32,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 04/2026",
+    "sort_key": 202604,
+    "ten_file_goc": "BC_2026_thang_04_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 31733,
+        "fname": "BC_2026_thang_04_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_04_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1kKY8jidMzeDbd7rQf9qczR7g58qvMB2K"
+      },
+      {
+        "ext": "pdf",
+        "size": 1994481,
+        "fname": "BC_2026_thang_04_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_04_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1iePz1D0ZTagbquK5dCr8t9Ib8N5YiR0Q"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 33,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2026,
+    "ky_label": "Tháng 01/2026",
+    "sort_key": 202601,
+    "ten_file_goc": "BC_2026_thang_01_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34202,
+        "fname": "BC_2026_thang_01_BC-tinh-hinh-trien-khai-DA_v2.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_01_BC-tinh-hinh-trien-khai-DA_v2.docx",
+        "drive_file_id": "1Iw8O7zhczTgx6o7aDsfkQXLFQxt-gEjE"
+      },
+      {
+        "ext": "pdf",
+        "size": 2564480,
+        "fname": "BC_2026_thang_01_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026/BC_2026_thang_01_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "drive_file_id": "1MaracCHC8C3ao2gsY1PEAM5LBj0MU8-z"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2026"
+  },
+  {
+    "id": 34,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 12/2025",
+    "sort_key": 202512,
+    "ten_file_goc": "BC_2025_thang_12_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34531,
+        "fname": "BC_2025_thang_12_BC-tinh-hinh-trien-khai-DA_v2.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_12_BC-tinh-hinh-trien-khai-DA_v2.docx",
+        "drive_file_id": "1MfHnPVh-hKk6md50l88ecKsjixhqiGZC"
+      },
+      {
+        "ext": "pdf",
+        "size": 2139847,
+        "fname": "BC_2025_thang_12_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_12_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "drive_file_id": "12FmnK2ZrS9M22lqJ1TU-v63ZHxILB9uz"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 35,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 11/2025",
+    "sort_key": 202511,
+    "ten_file_goc": "BC_2025_thang_11_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34110,
+        "fname": "BC_2025_thang_11_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_11_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1owbMB3vDzVo7l4IU2k5VjQq4nNQpU-9d"
+      },
+      {
+        "ext": "pdf",
+        "size": 1975602,
+        "fname": "BC_2025_thang_11_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_11_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1EkpM3zYBzlHiJqk1fj0gbQLCo5a1inEj"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 36,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 10/2025",
+    "sort_key": 202510,
+    "ten_file_goc": "BC_2025_thang_10_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34306,
+        "fname": "BC_2025_thang_10_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_10_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1okD_VxogV0C7Ugt0_kN8vdqyInL2NjTv"
+      },
+      {
+        "ext": "pdf",
+        "size": 1913723,
+        "fname": "BC_2025_thang_10_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_10_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1DDm7UmWlKyv7vyPMucICki3v-nLUI_fF"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 37,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 09/2025",
+    "sort_key": 202509,
+    "ten_file_goc": "BC_2025_thang_09_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32690,
+        "fname": "BC_2025_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1Y204wA85ISjJvowHCDCkuMbdNO1WCW8s"
+      },
+      {
+        "ext": "pdf",
+        "size": 1206049,
+        "fname": "BC_2025_thang_09_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_09_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1bpEud4kaNtqCEbCI1U72JWyiv31BlCF_"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 38,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 06/2025",
+    "sort_key": 202506,
+    "ten_file_goc": "BC_2025_thang_06_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32517,
+        "fname": "BC_2025_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1NV8JeZXGY2b-aFHjTU7IGHn3Mq0B4Td3"
+      },
+      {
+        "ext": "pdf",
+        "size": 1165763,
+        "fname": "BC_2025_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "19fCtosxHQSxAWA03Zj2IcjKKyMfUIGXU"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 39,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 05/2025",
+    "sort_key": 202505,
+    "ten_file_goc": "BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 1245490,
+        "fname": "BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA_v2.pdf",
+        "drive_file_id": "1bt_GdE4WRptE1c788ssousMlVVm9Mp-c"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 40,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 05/2025",
+    "sort_key": 202505,
+    "ten_file_goc": "BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 32767,
+        "fname": "BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_05_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1zTsvLo0DEWu09pdqNIITePVp-YFmoWr0"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 41,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 04/2025",
+    "sort_key": 202504,
+    "ten_file_goc": "BC_2025_thang_04_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 29567,
+        "fname": "BC_2025_thang_04_BC-tinh-hinh-trien-khai-DA_v3.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_04_BC-tinh-hinh-trien-khai-DA_v3.docx",
+        "drive_file_id": "1lQtnAZRoIwNJ9bnYx0XYVuTz2ux0VaAl"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 42,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 03/2025",
+    "sort_key": 202503,
+    "ten_file_goc": "BC_2025_thang_03_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 36637,
+        "fname": "BC_2025_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1PykSL8hMVwENZrZTtp9YXLEht4OiMNLl"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 43,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 02/2025",
+    "sort_key": 202502,
+    "ten_file_goc": "BC_2025_thang_02_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 35865,
+        "fname": "BC_2025_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1nG6Vr2MM2zLFBGghM7SIUctHwSyXPEDw"
+      },
+      {
+        "ext": "pdf",
+        "size": 2283964,
+        "fname": "BC_2025_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1EtCdQ3QPD6NjdQAdApfvsGevFcW-OsNA"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 44,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2025,
+    "ky_label": "Tháng 01/2025",
+    "sort_key": 202501,
+    "ten_file_goc": "BC_2025_thang_01_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 35865,
+        "fname": "BC_2025_thang_01_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025/BC_2025_thang_01_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1uvKfHK-wImatHCr_HJW83nHc8ktxqNQ5"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2025"
+  },
+  {
+    "id": 45,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 12/2024",
+    "sort_key": 202412,
+    "ten_file_goc": "BC_2024_thang_12_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 35002,
+        "fname": "BC_2024_thang_12_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_12_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "14zrcJqXDYipSWZwGXfLmO9HYEkrrBzOp"
+      },
+      {
+        "ext": "pdf",
+        "size": 2174397,
+        "fname": "BC_2024_thang_12_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_12_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1YvnnYxjW66jPlcISihrOQpQgqKrV0i46"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 46,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 11/2024",
+    "sort_key": 202411,
+    "ten_file_goc": "BC_2024_thang_11_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33837,
+        "fname": "BC_2024_thang_11_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_11_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1BkW5G5AgcGzrx2JE52wiWvrj7d7RjQ18"
+      },
+      {
+        "ext": "pdf",
+        "size": 1945883,
+        "fname": "BC_2024_thang_11_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_11_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1l1hdrtb8X8P_S3EdGxWPj6QMW6k5CAOM"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 47,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 10/2024",
+    "sort_key": 202410,
+    "ten_file_goc": "BC_2024_thang_10_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34456,
+        "fname": "BC_2024_thang_10_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_10_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1PLnRgsIyYo0c20-Jcj62WEH-S2jxqhWK"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 48,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 09/2024",
+    "sort_key": 202409,
+    "ten_file_goc": "BC_2024_thang_09_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33917,
+        "fname": "BC_2024_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1wFGp0oKAs_GbwPm4tZToExZCxu52h89L"
+      },
+      {
+        "ext": "pdf",
+        "size": 2245019,
+        "fname": "BC_2024_thang_09_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_09_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1hKrJ01qmZdpJmV0xLjLSYVCpF4oI3d4S"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 49,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 08/2024",
+    "sort_key": 202408,
+    "ten_file_goc": "BC_2024_thang_08_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33345,
+        "fname": "BC_2024_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1urY8P7PM34nxQqIACei0xDZeg8trMyY5"
+      },
+      {
+        "ext": "pdf",
+        "size": 1953864,
+        "fname": "BC_2024_thang_08_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_08_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1mXjgq6bGCKbIOk6cPkINUrim8dkYHJxV"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 50,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 06/2024",
+    "sort_key": 202406,
+    "ten_file_goc": "BC_2024_thang_06_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33505,
+        "fname": "BC_2024_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_06_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "16OtCrQuN3hRDvuiDnnXTdQD-uw4P9TIv"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 51,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 03/2024",
+    "sort_key": 202403,
+    "ten_file_goc": "BC_2024_thang_03_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 34425,
+        "fname": "BC_2024_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1xaHErhcrrQkr87JIPHn_aY_CYQy_8xxv"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 52,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2024,
+    "ky_label": "Tháng 02/2024",
+    "sort_key": 202402,
+    "ten_file_goc": "BC_2024_thang_02_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 25938,
+        "fname": "BC_2024_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1mNfDkhb3pIFdx5KF10cviexUKPGa4oyl"
+      },
+      {
+        "ext": "pdf",
+        "size": 1364417,
+        "fname": "BC_2024_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024/BC_2024_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1i59Em5F-UpcpziE7Gr7gs1n7rr20bpmX"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2024"
+  },
+  {
+    "id": 53,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2023,
+    "ky_label": "Tháng 09/2023",
+    "sort_key": 202309,
+    "ten_file_goc": "BC_2023_thang_09_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 33814,
+        "fname": "BC_2023_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "17y-QSjI7wUU3eWubO5glQcR_3NB1u7sE"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023"
+  },
+  {
+    "id": 54,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2023,
+    "ky_label": "Tháng 08/2023",
+    "sort_key": 202308,
+    "ten_file_goc": "BC_2023_thang_08_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 35536,
+        "fname": "BC_2023_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_08_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1b9CeThoj2LnuT54Otb9ORxrhTdxritFF"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023"
+  },
+  {
+    "id": 55,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2023,
+    "ky_label": "Tháng 07/2023",
+    "sort_key": 202307,
+    "ten_file_goc": "BC_2023_thang_07_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 35253,
+        "fname": "BC_2023_thang_07_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_07_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1m1-LTekr7UqpZbJX6oqR-Wdu20AzpeJV"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023"
+  },
+  {
+    "id": 56,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2023,
+    "ky_label": "Tháng 03/2023",
+    "sort_key": 202303,
+    "ten_file_goc": "BC_2023_thang_03_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 81920,
+        "fname": "BC_2023_thang_03_BC-tinh-hinh-trien-khai-DA.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_03_BC-tinh-hinh-trien-khai-DA.doc",
+        "drive_file_id": "1XyB7iUSr6pCYEz9DFKYrfhTldDfC0KWr"
+      },
+      {
+        "ext": "pdf",
+        "size": 3197405,
+        "fname": "BC_2023_thang_03_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_03_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1ZBYm1ORZkf2mwaS4HZa5Z893ElQUw-IX"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023"
+  },
+  {
+    "id": 57,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2023,
+    "ky_label": "Tháng 02/2023",
+    "sort_key": 202302,
+    "ten_file_goc": "BC_2023_thang_02_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 40154,
+        "fname": "BC_2023_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_02_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1HsdJ0WlZX2HHd4MdXox595xX7VbXPhsu"
+      },
+      {
+        "ext": "pdf",
+        "size": 3673250,
+        "fname": "BC_2023_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023/BC_2023_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1_nr9j8gz4sSH1_oHC4v8tPd-l_4eLMBi"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2023"
+  },
+  {
+    "id": 58,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 11/2022",
+    "sort_key": 202211,
+    "ten_file_goc": "BC_2022_thang_11_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 242176,
+        "fname": "BC_2022_thang_11_BC-tinh-hinh-trien-khai-DA.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_11_BC-tinh-hinh-trien-khai-DA.doc",
+        "drive_file_id": "1808QP0N6PNFSCc88HXCRwzhifP9-PMxH"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  },
+  {
+    "id": 59,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 09/2022",
+    "sort_key": 202209,
+    "ten_file_goc": "BC_2022_thang_09_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 27375,
+        "fname": "BC_2022_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_09_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "1NnPrpDMQIHmsx1JKZs4VctN_SKUstmci"
+      }
+    ],
+    "trang_thai": "thieu_ky",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  },
+  {
+    "id": 60,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 06/2022",
+    "sort_key": 202206,
+    "ten_file_goc": "BC_2022_thang_06_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 2192659,
+        "fname": "BC_2022_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_06_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "10lGxuXWMpBAENRfbHIPgvKVxOMO0W0qv"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  },
+  {
+    "id": 61,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 04/2022",
+    "sort_key": 202204,
+    "ten_file_goc": "BC_2022_thang_04_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "pdf",
+        "size": 3686091,
+        "fname": "BC_2022_thang_04_BC-tinh-hinh-trien-khai-DA_v3.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_04_BC-tinh-hinh-trien-khai-DA_v3.pdf",
+        "drive_file_id": "1YvFUsEJyrQJSa_iB8dsGVhDUKLzBkAKI"
+      }
+    ],
+    "trang_thai": "chi_co_scan",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  },
+  {
+    "id": 62,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 03/2022",
+    "sort_key": 202203,
+    "ten_file_goc": "BC_2022_thang_03_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "docx",
+        "size": 22141,
+        "fname": "BC_2022_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_03_BC-tinh-hinh-trien-khai-DA.docx",
+        "drive_file_id": "19U1yn0fOySJFDQiqUSTmwHwSlg-Guwpo"
+      },
+      {
+        "ext": "pdf",
+        "size": 1839267,
+        "fname": "BC_2022_thang_03_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_03_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1nNFd3vMfIPMlQX47WfmTtrdGwRHMse50"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  },
+  {
+    "id": 63,
+    "nhom": "soxd_tinh_hinh",
+    "nhom_label": "Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng",
+    "chu_ky": "thang",
+    "nam": 2022,
+    "ky_label": "Tháng 02/2022",
+    "sort_key": 202202,
+    "ten_file_goc": "BC_2022_thang_02_BC-tinh-hinh-trien-khai-DA",
+    "files": [
+      {
+        "ext": "doc",
+        "size": 140800,
+        "fname": "BC_2022_thang_02_BC-tinh-hinh-trien-khai-DA.doc",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_02_BC-tinh-hinh-trien-khai-DA.doc",
+        "drive_file_id": "1t2wqprZgEenGuSKoR0e0vGuT8mbeCCQs"
+      },
+      {
+        "ext": "pdf",
+        "size": 1638664,
+        "fname": "BC_2022_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "duong_dan_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022/BC_2022_thang_02_BC-tinh-hinh-trien-khai-DA.pdf",
+        "drive_file_id": "1dpaROd5f20jX4uY0tIPzLQJoLAE6s6zE"
+      }
+    ],
+    "trang_thai": "du",
+    "duong_dan_cu": "4_Baocao_Thang_SoXD",
+    "thu_muc_moi": "1_Dinh_ky/1.1_Thang/SoXD_tinh_hinh_trien_khai/2022"
+  }
+];
+
+const NHOM_OPTIONS = [
+  {v:"soxd_qua_web", l:"Báo cáo tiến độ qua Cổng TT Sở Xây dựng"},
+  {v:"phieu_gia_tri_xd", l:"Phiếu giá trị SXD tháng (thống kê)"},
+  {v:"soxd_tinh_hinh", l:"Báo cáo tình hình triển khai DA (tháng) – Sở Xây dựng"},
+  {v:"giam_sat_dau_tu", l:"Báo cáo giám sát, đánh giá đầu tư – Sở Tài chính"},
+  {v:"ke_hoach_tien_do", l:"Kế hoạch tiến độ chi tiết gửi CQNN"},
+  {v:"khac", l:"Khác"},
+];
+const NHOM_LABEL = Object.fromEntries(NHOM_OPTIONS.map(o=>[o.v,o.l]));
+const STATUS_LABEL = {du:"Đủ hồ sơ", thieu_ky:"Thiếu bản ký/scan", chi_co_scan:"Chỉ có bản scan", khac:"Khác"};
+
+/* Deadline được lấy từ to-do-list dự án — cập nhật tại đây khi có hạn mới */
+const DEADLINES = [
+  {label:"Phiếu giá trị SXD tháng 09/2026", han:"2026-09-11"},
+  {label:"Báo cáo giám sát, đánh giá đầu tư Quý III/2026", han:"2026-10-10"},
+];
+
+const LS_OVERLAY_KEY = "tvbc_overlay_v1";
+const DB_NAME = "tvbc_attachments_db";
+const DB_STORE = "attachments";
+
+/* ---------- Overlay (thêm/sửa/xóa) lưu trong localStorage ---------- */
+function loadOverlay(){
+  try{
+    const raw = localStorage.getItem(LS_OVERLAY_KEY);
+    if(!raw) return {added:[], edited:{}, deleted:[]};
+    const o = JSON.parse(raw);
+    return {added:o.added||[], edited:o.edited||{}, deleted:o.deleted||[]};
+  }catch(e){ return {added:[], edited:{}, deleted:[]}; }
+}
+function saveOverlay(o){
+  localStorage.setItem(LS_OVERLAY_KEY, JSON.stringify(o));
+}
+let overlay = loadOverlay();
+let nextNewId = -1;
+(function initNextId(){
+  const ids = overlay.added.map(r=>r.id);
+  if(ids.length) nextNewId = Math.min(...ids) - 1;
+})();
+
+function getAllReports(){
+  let base = REPORTS_DATA.map(r=>({...r}));
+  base = base.filter(r => !overlay.deleted.includes(r.id));
+  base = base.map(r => overlay.edited[r.id] ? {...r, ...overlay.edited[r.id]} : r);
+  const added = overlay.added.filter(r=>!overlay.deleted.includes(r.id));
+  return base.concat(added);
+}
+
+/* ---------- IndexedDB cho file đính kèm thực ---------- */
+let dbPromise = null;
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = ()=>{
+      const db = req.result;
+      if(!db.objectStoreNames.contains(DB_STORE)){
+        const store = db.createObjectStore(DB_STORE, {keyPath:"aid", autoIncrement:true});
+        store.createIndex("report_id","report_id",{unique:false});
+      }
+    };
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+  return dbPromise;
+}
+async function addAttachment(reportId, file){
+  const db = await openDB();
+  const buf = await file.arrayBuffer();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(DB_STORE,"readwrite");
+    tx.objectStore(DB_STORE).add({
+      report_id: reportId, fname: file.name, type: file.type,
+      size: file.size, uploaded_at: new Date().toISOString(), data: buf
+    });
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+async function getAttachments(reportId){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(DB_STORE,"readonly");
+    const idx = tx.objectStore(DB_STORE).index("report_id");
+    const req = idx.getAll(IDBKeyRange.only(reportId));
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+}
+async function getAttachmentCounts(){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(DB_STORE,"readonly");
+    const req = tx.objectStore(DB_STORE).getAll();
+    req.onsuccess = ()=>{
+      const counts = {};
+      req.result.forEach(a=>{ counts[a.report_id] = (counts[a.report_id]||0)+1; });
+      resolve(counts);
+    };
+    req.onerror = ()=>reject(req.error);
+  });
+}
+async function deleteAttachment(aid){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(DB_STORE,"readwrite");
+    tx.objectStore(DB_STORE).delete(aid);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+function downloadBlob(fname, type, buf){
+  const blob = new Blob([buf], {type: type || "application/octet-stream"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+}
+
+let attachmentCounts = {};
+
+/* ---------- Toast ---------- */
+let toastTimer=null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"), 2600);
+}
+
+/* ---------- Deadlines ---------- */
+function renderDeadlines(){
+  const wrap = document.getElementById("deadlines");
+  wrap.innerHTML = "";
+  const now = new Date(); now.setHours(0,0,0,0);
+  DEADLINES.forEach(d=>{
+    const han = new Date(d.han+"T00:00:00");
+    const diffDays = Math.round((han - now)/86400000);
+    let cls="ok", txt="";
+    if(diffDays < 0){ cls="urgent"; txt=`Đã quá hạn ${Math.abs(diffDays)} ngày`; }
+    else if(diffDays<=3){ cls="urgent"; txt = diffDays===0? "Hạn chót HÔM NAY" : `Còn ${diffDays} ngày`; }
+    else if(diffDays<=14){ cls="soon"; txt=`Còn ${diffDays} ngày`; }
+    else { cls="ok"; txt=`Còn ${diffDays} ngày`; }
+    const card = document.createElement("div");
+    card.className = "dl-card "+cls;
+    card.innerHTML = `<div class="dl-label">⏰ ${d.label}</div>
+      <div class="dl-meta">Hạn: ${formatDateVN(d.han)}</div>
+      <div class="dl-days">${txt}</div>`;
+    wrap.appendChild(card);
+  });
+}
+function formatDateVN(iso){
+  const [y,m,d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/* ---------- Stats ---------- */
+function renderStats(list){
+  const total = list.length;
+  const du = list.filter(r=>r.trang_thai==="du").length;
+  const thieu = list.filter(r=>r.trang_thai==="thieu_ky").length;
+  const scan = list.filter(r=>r.trang_thai==="chi_co_scan").length;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card total"><div class="num">${total}</div><div class="lbl">Tổng số báo cáo</div></div>
+    <div class="stat-card du"><div class="num">${du}</div><div class="lbl">Đủ hồ sơ (gốc + ký/scan)</div></div>
+    <div class="stat-card thieu"><div class="num">${thieu}</div><div class="lbl">Thiếu bản ký/scan</div></div>
+    <div class="stat-card scan"><div class="num">${scan}</div><div class="lbl">Chỉ có bản scan</div></div>
+  `;
+}
+
+/* ---------- Filters ---------- */
+function populateFilterOptions(){
+  const all = getAllReports();
+  const nhomSel = document.getElementById("filterNhom");
+  const namSel = document.getElementById("filterNam");
+  const ckSel = document.getElementById("filterChuKy");
+  const tsSel = document.getElementById("filterTrangThai");
+  const fNhom = document.getElementById("fNhom");
+
+  const nhoms = [...new Set(all.map(r=>r.nhom))];
+  nhomSel.innerHTML = '<option value="">-- Nhóm / Loại báo cáo --</option>' +
+    nhoms.map(n=>`<option value="${n}">${NHOM_LABEL[n]||n}</option>`).join("");
+  fNhom.innerHTML = NHOM_OPTIONS.map(o=>`<option value="${o.v}">${o.l}</option>`).join("");
+
+  const nams = [...new Set(all.map(r=>r.nam))].sort((a,b)=>b-a);
+  namSel.innerHTML = '<option value="">-- Năm --</option>' +
+    nams.map(n=>`<option value="${n}">${n||"Chưa rõ"}</option>`).join("");
+
+  const cks = [...new Set(all.map(r=>r.chu_ky))];
+  const ckLabel = {thang:"Hàng tháng", quy:"Hàng quý", dot_xuat:"Đột xuất", "6thang":"6 tháng", nam:"Hàng năm"};
+  ckSel.innerHTML = '<option value="">-- Chu kỳ --</option>' +
+    cks.map(c=>`<option value="${c}">${ckLabel[c]||c}</option>`).join("");
+
+  tsSel.innerHTML = '<option value="">-- Trạng thái --</option>' +
+    Object.entries(STATUS_LABEL).map(([k,l])=>`<option value="${k}">${l}</option>`).join("");
+}
+
+function getFiltered(){
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  const fN = document.getElementById("filterNhom").value;
+  const fY = document.getElementById("filterNam").value;
+  const fC = document.getElementById("filterChuKy").value;
+  const fS = document.getElementById("filterTrangThai").value;
+  let list = getAllReports();
+  if(fN) list = list.filter(r=>r.nhom===fN);
+  if(fY) list = list.filter(r=>String(r.nam)===fY);
+  if(fC) list = list.filter(r=>r.chu_ky===fC);
+  if(fS) list = list.filter(r=>r.trang_thai===fS);
+  if(q) list = list.filter(r =>
+    (r.ten_file_goc||"").toLowerCase().includes(q) ||
+    (r.ky_label||"").toLowerCase().includes(q) ||
+    (r.nhom_label||"").toLowerCase().includes(q) ||
+    String(r.nam||"").includes(q)
+  );
+  return list;
+}
+
+let sortState = {key:"nhom", dir:1};
+function sortList(list){
+  return list.slice().sort((a,b)=>{
+    if(a.nhom !== b.nhom) return a.nhom < b.nhom ? -1:1;
+    const k = sortState.key;
+    let av = a[k], bv = b[k];
+    if(k==="ten_file_goc") { av=(av||"").toLowerCase(); bv=(bv||"").toLowerCase(); }
+    if(av<bv) return -1*sortState.dir;
+    if(av>bv) return 1*sortState.dir;
+    return 0;
+  });
+}
+
+/* ---------- Render bảng ---------- */
+async function renderTable(){
+  attachmentCounts = await getAttachmentCounts();
+  const filtered = getFiltered();
+  renderStats(filtered);
+  const sorted = sortList(filtered);
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  document.getElementById("resultCount").textContent = `Hiển thị ${sorted.length} / ${getAllReports().length} báo cáo`;
+
+  if(sorted.length===0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Không có báo cáo nào phù hợp bộ lọc.</td></tr>`;
+    return;
+  }
+
+  let curNhom = null, stt = 0;
+  sorted.forEach(r=>{
+    if(r.nhom !== curNhom){
+      curNhom = r.nhom;
+      const tr = document.createElement("tr");
+      tr.className = "grp-row";
+      const cnt = sorted.filter(x=>x.nhom===curNhom).length;
+      tr.innerHTML = `<td colspan="4">${NHOM_LABEL[curNhom]||curNhom} (${cnt} báo cáo)</td>`;
+      tbody.appendChild(tr);
+    }
+    stt++;
+    const tr = document.createElement("tr");
+    const dlBtns = (r.files||[]).map(f=>{
+      const ext = (f.ext||"").toUpperCase();
+      if(f.drive_file_id){
+        const dlUrl = `https://drive.google.com/uc?export=download&id=${f.drive_file_id}`;
+        return `<a class="dl-pill" href="${dlUrl}" target="_blank" rel="noopener" title="Tải .${f.ext} (${formatSize(f.size)}) — mở trên Drive">
+                  <span class="dl-arrow">⬇</span>${ext}
+                </a>`;
+      }
+      return `<span class="dl-pill" style="opacity:.55;cursor:default;">${ext}</span>`;
+    }).join("");
+    const fileCell = `<div class="dl-box"><div class="dl-btns">${dlBtns || "—"}</div></div>`;
+    const upCount = attachmentCounts[r.id] || 0;
+    const upTag = upCount>0 ? `<span class="filetag up">📎 ${upCount} file đã tải lên</span>` : "";
+    tr.innerHTML = `
+      <td>${stt}</td>
+      <td><strong>${escapeHtml(r.ten_file_goc||"")}</strong><br><span class="path">${escapeHtml(r.ky_label||"")}${r.nam?" · "+r.nam:""}</span></td>
+      <td>${fileCell}${upTag ? "<br>"+upTag : ""}</td>
+      <td class="row-actions">
+        <button class="btn btn-sm" data-act="upload" data-id="${r.id}">📎 Đính kèm</button>
+        <button class="btn btn-sm" data-act="edit" data-id="${r.id}">✏ Sửa</button>
+        ${r.id<0 ? `<button class="btn btn-sm" data-act="delete" data-id="${r.id}">🗑 Xóa</button>` : ""}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function formatSize(bytes){
+  if(!bytes) return "0KB";
+  if(bytes<1024*1024) return (bytes/1024).toFixed(0)+"KB";
+  return (bytes/1024/1024).toFixed(1)+"MB";
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- Modal thêm/sửa ---------- */
+function openModal(id){ document.getElementById(id).classList.add("show"); }
+function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+
+document.getElementById("btnAddReport").addEventListener("click", ()=>{
+  document.getElementById("modalAddTitle").textContent = "+ Thêm báo cáo mới";
+  document.getElementById("editId").value = "";
+  document.getElementById("fTen").value = "";
+  document.getElementById("fNhom").value = "soxd_tinh_hinh";
+  document.getElementById("fNam").value = new Date().getFullYear();
+  document.getElementById("fKy").value = "";
+  document.getElementById("fTrangThai").value = "thieu_ky";
+  document.getElementById("fViTri").value = "";
+  openModal("modalAdd");
+});
+
+document.getElementById("btnSaveReport").addEventListener("click", ()=>{
+  const ten = document.getElementById("fTen").value.trim();
+  const nhom = document.getElementById("fNhom").value;
+  const nam = parseInt(document.getElementById("fNam").value) || 0;
+  const ky = document.getElementById("fKy").value.trim();
+  const ts = document.getElementById("fTrangThai").value;
+  const viTri = document.getElementById("fViTri").value.trim();
+  if(!ten || !ky){ toast("Vui lòng nhập đủ Tên báo cáo và Kỳ báo cáo"); return; }
+  const editId = document.getElementById("editId").value;
+
+  if(editId){
+    const id = parseInt(editId);
+    overlay.edited[id] = {
+      ten_file_goc: ten, nhom, nhom_label: NHOM_LABEL[nhom]||nhom,
+      nam, ky_label: ky, trang_thai: ts, vi_tri_luu_tru: viTri,
+      sort_key: (overlay.edited[id]&&overlay.edited[id].sort_key) || nam*100
+    };
+  } else {
+    overlay.added.push({
+      id: nextNewId--, nhom, nhom_label: NHOM_LABEL[nhom]||nhom,
+      chu_ky: nhom==="giam_sat_dau_tu"?"quy":(nhom==="ke_hoach_tien_do"?"dot_xuat":"thang"),
+      nam, ky_label: ky, sort_key: nam*100, ten_file_goc: ten,
+      files: [], trang_thai: ts, duong_dan_cu: "", thu_muc_moi: null, vi_tri_luu_tru: viTri
+    });
+  }
+  saveOverlay(overlay);
+  closeModal("modalAdd");
+  populateFilterOptions();
+  renderTable();
+  toast("Đã lưu báo cáo.");
+});
+
+/* ---------- Modal đính kèm ---------- */
+let currentUploadReportId = null;
+async function openUploadModal(reportId){
+  currentUploadReportId = reportId;
+  const all = getAllReports();
+  const r = all.find(x=>x.id===reportId);
+  document.getElementById("uploadReportName").textContent = r ? r.ten_file_goc : "";
+  await renderAttachList(reportId);
+  openModal("modalUpload");
+}
+async function renderAttachList(reportId){
+  const list = await getAttachments(reportId);
+  const wrap = document.getElementById("attachList");
+  if(list.length===0){ wrap.innerHTML = '<p class="hint">Chưa có file nào được tải lên cho báo cáo này.</p>'; return; }
+  wrap.innerHTML = list.map(a=>`
+    <div class="attach-item">
+      <span>📄 ${escapeHtml(a.fname)} (${formatSize(a.size)})</span>
+      <span>
+        <button class="btn btn-sm" data-dl="${a.aid}">Tải xuống</button>
+        <button class="btn btn-sm" data-rm="${a.aid}">Xóa</button>
+      </span>
+    </div>
+  `).join("");
+  wrap.querySelectorAll("[data-dl]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const item = list.find(x=>x.aid===parseInt(btn.dataset.dl));
+      downloadBlob(item.fname, item.type, item.data);
+    });
+  });
+  wrap.querySelectorAll("[data-rm]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      await deleteAttachment(parseInt(btn.dataset.rm));
+      await renderAttachList(reportId);
+      renderTable();
+      toast("Đã xóa file đính kèm.");
+    });
+  });
+}
+document.getElementById("uploadFileInput").addEventListener("change", async (e)=>{
+  const files = Array.from(e.target.files);
+  for(const f of files){
+    await addAttachment(currentUploadReportId, f);
+  }
+  e.target.value = "";
+  await renderAttachList(currentUploadReportId);
+  renderTable();
+  toast(`Đã đính kèm ${files.length} file.`);
+});
+
+/* ---------- Table action delegation ---------- */
+document.getElementById("tableBody").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-act]");
+  if(!btn) return;
+  const id = parseInt(btn.dataset.id);
+  const act = btn.dataset.act;
+  if(act==="upload") openUploadModal(id);
+  if(act==="edit") openEditModal(id);
+  if(act==="delete") doDelete(id);
+});
+function openEditModal(id){
+  const r = getAllReports().find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById("modalAddTitle").textContent = "✏ Sửa báo cáo";
+  document.getElementById("editId").value = id;
+  document.getElementById("fTen").value = r.ten_file_goc||"";
+  document.getElementById("fNhom").value = r.nhom;
+  document.getElementById("fNam").value = r.nam||"";
+  document.getElementById("fKy").value = r.ky_label||"";
+  document.getElementById("fTrangThai").value = r.trang_thai;
+  document.getElementById("fViTri").value = r.vi_tri_luu_tru || r.thu_muc_moi || "";
+  openModal("modalAdd");
+}
+function doDelete(id){
+  if(!confirm("Xóa báo cáo này khỏi danh sách?")) return;
+  overlay.deleted.push(id);
+  saveOverlay(overlay);
+  renderTable();
+  toast("Đã xóa báo cáo.");
+}
+
+/* ---------- Export / Import ---------- */
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const payload = {
+    exported_at: new Date().toISOString(),
+    overlay: overlay,
+    note: "File đính kèm thực (IndexedDB) KHÔNG nằm trong bản xuất này. Chỉ có phần thêm/sửa/xóa danh sách."
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const d = new Date();
+  const stamp = d.toISOString().slice(0,10);
+  a.href = url; a.download = `thu_vien_bao_cao_backup_${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+  toast("Đã xuất file sao lưu (JSON).");
+});
+document.getElementById("btnImportTrigger").addEventListener("click", ()=>{
+  document.getElementById("importFile").click();
+});
+document.getElementById("importFile").addEventListener("change", (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const payload = JSON.parse(reader.result);
+      if(payload.overlay){
+        overlay = {
+          added: payload.overlay.added || [],
+          edited: payload.overlay.edited || {},
+          deleted: payload.overlay.deleted || []
+        };
+        saveOverlay(overlay);
+        populateFilterOptions();
+        renderTable();
+        toast("Đã nhập dữ liệu sao lưu thành công.");
+      } else {
+        toast("File không đúng định dạng sao lưu.");
+      }
+    }catch(err){
+      toast("Lỗi đọc file: "+err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+/* ---------- Sort header ---------- */
+document.querySelectorAll("thead th[data-sort]").forEach(th=>{
+  th.addEventListener("click", ()=>{
+    const key = th.dataset.sort;
+    if(sortState.key===key) sortState.dir *= -1;
+    else { sortState.key = key; sortState.dir = 1; }
+    renderTable();
+  });
+});
+
+/* ---------- Filter listeners ---------- */
+["searchBox","filterNhom","filterNam","filterChuKy","filterTrangThai"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", renderTable);
+  document.getElementById(id).addEventListener("change", renderTable);
+});
+document.getElementById("btnClearFilter").addEventListener("click", ()=>{
+  document.getElementById("searchBox").value = "";
+  document.getElementById("filterNhom").value = "";
+  document.getElementById("filterNam").value = "";
+  document.getElementById("filterChuKy").value = "";
+  document.getElementById("filterTrangThai").value = "";
+  renderTable();
+});
+
+/* Đóng modal khi click nền */
+document.querySelectorAll(".modal-overlay").forEach(ov=>{
+  ov.addEventListener("click", (e)=>{ if(e.target===ov) ov.classList.remove("show"); });
+});
+
+/* ---------- Khởi tạo ---------- */
+document.getElementById("genDate").textContent = new Date().toLocaleDateString("vi-VN");
+renderDeadlines();
+populateFilterOptions();
+renderTable();
+</script>
+</body>
+</html>
