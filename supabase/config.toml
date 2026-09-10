@@ -1,0 +1,2 @@
+[functions.chatbot]
+verify_jwt = false
