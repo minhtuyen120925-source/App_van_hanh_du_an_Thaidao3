@@ -6,107 +6,21 @@ const TODAY = new Date();
 const MOC = new Date('2026-10-30');
 const KHOICONG = new Date('2025-07-20');
 
-const contracts = {
-  TT: { ten:"Trọng Tín Group", tenNgan:"Trọng Tín", goi:"Thi công hạ tầng kỹ thuật + lắp đặt thiết bị",
-        soHD:"1507/2025/HĐXD/BH-TT", ngayKy:"2025-07-15", giaTri:54004604560,
-        nghiemThu:8919343187, giaiNgan:29027409000, tamUng:21000000000, tamUngConLai:20108066000,
-        mocHT:"2026-10-30", mocGoc:"2026-08-31", blTHHD:null, blTamUng:null, hanBL:null },
-  VG: { ten:"Môi trường V-GREEN", tenNgan:"V-Green", goi:"Thi công hệ thống XLNT 160 m³/ngày đêm",
-        soHD:"68/2026/HĐKT/BH-VG", ngayKy:"2026-04-15", giaTri:4157369457,
-        nghiemThu:null, giaiNgan:null, tamUng:null, tamUngConLai:null,
-        mocHT:"2026-10-02", mocGoc:"2026-10-02", blTHHD:null, blTamUng:null, hanBL:null }
-};
+const contracts = window.SB_DATA.contracts;
 
 /* Hạng mục hợp nhất — nt: TT|VG. Số V-Green theo Phụ lục I HĐ 68/2026; sanLuong/nghiemThu VG chưa có hồ sơ */
-const hangMuc = [
-  { id:"I",    nt:"TT", ten:"HM Giao thông",                giaTriHD:23957233328, sanLuong:5715062964, nghiemThu:1714787009, slTodo:false , thanhToan:1714787009 },
-  { id:"II",   nt:"TT", ten:"HM Cấp nước",                  giaTriHD:1064565380,  sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"III",  nt:"TT", ten:"HM PCCC",                      giaTriHD:209359618,   sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"IV",   nt:"TT", ten:"HM San nền",                   giaTriHD:5373010516,  sanLuong:5759913267, nghiemThu:4265753208, slTodo:false , thanhToan:4265753208 },
-  { id:"V",    nt:"TT", ten:"HM Thoát nước mưa",            giaTriHD:5052583610,  sanLuong:2566864049, nghiemThu:1260444695, slTodo:false, ghiChu:"Gồm hố thu + ga TNM/TNT 1,818 tỷ (chưa tách phần ga nước thải) + mương B600 0,941 tỷ + cống tròn 1,298 tỷ" , thanhToan:1260444695 },
-  { id:"VI",   nt:"TT", ten:"HM Thoát nước thải",           giaTriHD:1663057378,  sanLuong:1036924139, nghiemThu:0, slTodo:false, ghiChu:"Ống HDPE; phần ga nước thải đang nằm gộp bên HM V" , thanhToan:0 },
-  { id:"VII",  nt:"TT", ten:"HM Rãnh kỹ thuật",             giaTriHD:1687884978,  sanLuong:36141913, nghiemThu:0, slTodo:false , thanhToan:0 },
-  { id:"VIII", nt:"TT", ten:"HM Cống ngang + cống chéo",    giaTriHD:2313068719,  sanLuong:1863283631, nghiemThu:1678358275, slTodo:false, ghiChu:"Cống hộp N3+N6 theo BC nhà thầu" , thanhToan:1678358275 },
-  { id:"IX",   nt:"TT", ten:"HM Khuôn viên",                giaTriHD:2598996439,  sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"X",    nt:"TT", ten:"HM Đường dây trung áp 22kV",   giaTriHD:2087387543,  sanLuong:139048103, nghiemThu:0, slTodo:false , thanhToan:0 },
-  { id:"XI",   nt:"TT", ten:"HM Trạm biến áp",              giaTriHD:200841254,   sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"XII",  nt:"TT", ten:"HM Điện hạ thế sinh hoạt",     giaTriHD:2979292696,  sanLuong:120662401, nghiemThu:0, slTodo:false, ghiChu:"Phần điện + TTLL 0,3 tỷ gộp (chưa tách HM X, XV)" , thanhToan:0 },
-  { id:"XIII", nt:"TT", ten:"HM Điện chiếu sáng",           giaTriHD:2007058125,  sanLuong:56383565, nghiemThu:0, slTodo:false , thanhToan:0 },
-  { id:"XIV",  nt:"TT", ten:"HM Tháo dỡ đường dây",         giaTriHD:11820590,    sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"XV",   nt:"TT", ten:"HM Thông tin liên lạc",        giaTriHD:759603044,   sanLuong:0, nghiemThu:0, slTodo:true , thanhToan:0 },
-  { id:"TB-I",  nt:"TT", ten:"Thiết bị – Đường dây trung áp (phần B HĐ)",  giaTriHD:318522302,  sanLuong:0, nghiemThu:0, slTodo:true, thanhToan:0 },
-  { id:"TB-II", nt:"TT", ten:"Thiết bị – Trạm biến áp (phần B HĐ)",        giaTriHD:1720319040, sanLuong:0, nghiemThu:0, slTodo:true, thanhToan:0 },
-  { id:"VG-1", nt:"VG", ten:"XLNT – Phần xây dựng trạm",    giaTriHD:1746868155,  sanLuong:null, nghiemThu:null, slTodo:true , thanhToan:null },
-  { id:"VG-2", nt:"VG", ten:"XLNT – Thiết bị trạm",         giaTriHD:1894750440,  sanLuong:null, nghiemThu:null, slTodo:true , thanhToan:null },
-  { id:"VG-3", nt:"VG", ten:"XLNT – Lắp đặt TB, ống công nghệ, điện ĐK", giaTriHD:515750862, sanLuong:null, nghiemThu:null, slTodo:true, thanhToan:null }
-];
+const hangMuc = window.SB_DATA.hangMuc;
 
-const thanhToan = [
-  { hd:"TT", lan:"Tạm ứng", ngay:"2025-07-25", bienBan:"Tạm ứng hợp đồng", nghiemThu:0, giaiNgan:21000000000, thuHoiTU:0, traNT:21000000000, baoHanh:0 },
-  { hd:"TT", lan:"Lần 1",   ngay:"2026-05-05", bienBan:"1/NTKLHT-TT (PL3a ký 11/05/2026)", nghiemThu:3240732239, giaiNgan:2916659000, thuHoiTU:324073000, traNT:2754622000, baoHanh:162037000 },
-  { hd:"TT", lan:"Lần 2",   ngay:"2026-07-08", bienBan:"2/NTKLHT-TT (PL3a lần 2)", nghiemThu:5678610947, giaiNgan:5110750000, thuHoiTU:567861000, traNT:4855212000, baoHanh:255538000 },
-  { hd:"VG", lan:"—",       ngay:null, bienBan:"Chưa có hồ sơ thanh toán V-Green trong Project Knowledge", nghiemThu:null, giaiNgan:null, thuHoiTU:null, todo:true }
-];
+const thanhToan = window.SB_DATA.thanhToan;
 
-const dieuChinhHD = [
-  { hd:"TT", noiDung:"Giá trị hợp đồng gốc", pl:"1507/2025/HĐXD/BH-TT", ngay:"2025-07-15", gia:54004605000 },
-  { hd:"TT", noiDung:"Chưa phát sinh phụ lục điều chỉnh giá trị (rà soát đến kỳ TT lần 2, 08/07/2026)", pl:"—", ngay:null, gia:54004605000 },
-  { hd:"VG", noiDung:"Giá trị hợp đồng gốc (kèm Phụ lục I)", pl:"68/2026/HĐKT/BH-VG", ngay:"2026-04-15", gia:4157369457 }
-];
+const dieuChinhHD = window.SB_DATA.dieuChinhHD;
 
 /* Gantt: TT theo v03 + VG theo v01 */
-const tiendo = [
-  { grp:"TRỌNG TÍN — Hạ tầng kỹ thuật (tiến độ v03, 06/07/2026)" },
-  { stt:"B1",  nt:"TT", ten:"Hàng rào, cổng bảo vệ",        batDau:"2025-10-10", ketThuc:"2025-10-30" },
-  { stt:"B2",  nt:"TT", ten:"San nền",                      batDau:"2026-07-25", ketThuc:"2026-08-05" },
-  { stt:"B3",  nt:"TT", ten:"Giao thông",                   batDau:"2026-07-01", ketThuc:"2026-10-30" },
-  { stt:"B4",  nt:"TT", ten:"Thoát nước mưa",               batDau:"2026-07-20", ketThuc:"2026-09-25" },
-  { stt:"B5",  nt:"TT", ten:"Thoát nước thải",              batDau:"2026-07-15", ketThuc:"2026-08-20" },
-  { stt:"B6",  nt:"TT", ten:"Cấp điện hạ thế, TT liên lạc", batDau:"2026-07-25", ketThuc:"2026-09-30" },
-  { stt:"B7",  nt:"TT", ten:"Cấp nước, PCCC",               batDau:"2026-07-30", ketThuc:"2026-09-15" },
-  { stt:"B8",  nt:"TT", ten:"Cống ngang + cống chéo",       batDau:"2026-07-20", ketThuc:"2026-09-20" },
-  { stt:"B9",  nt:"TT", ten:"Di dời đường dây, TBA",        batDau:"2026-07-16", ketThuc:"2026-09-20" },
-  { stt:"B10", nt:"TT", ten:"Chiếu sáng",                   batDau:"2026-07-30", ketThuc:"2026-09-30" },
-  { stt:"B11", nt:"TT", ten:"Cây xanh cảnh quan",           batDau:"2026-08-15", ketThuc:"2026-10-10" },
-  { grp:"V-GREEN — Trạm XLNT 160 m³/ngđ (tiến độ v01, 20/05/2026)" },
-  { stt:"V1",  nt:"VG", ten:"Bể xử lý nước thải (móng, thân, hoàn thiện)", batDau:"2026-05-05", ketThuc:"2026-07-02" },
-  { stt:"V2",  nt:"VG", ten:"Nhà điều hành (móng, thân, mái)",             batDau:"2026-07-03", ketThuc:"2026-09-02" },
-  { stt:"V3",  nt:"VG", ten:"Lắp đặt thiết bị công nghệ, điện",            batDau:"2026-07-02", ketThuc:"2026-09-02" },
-  { stt:"V4",  nt:"VG", ten:"Chạy thử, vận hành, chuyển giao công nghệ",   batDau:"2026-09-03", ketThuc:"2026-10-02" }
-];
+const tiendo = window.SB_DATA.tiendo;
 
-const giaoDien = [
-  { ten:"Bàn giao mặt bằng khu đất trạm XLNT", giao:"Trọng Tín (san nền)", nhan:"V-Green", han:"05/05/2026", trangThai:"done", ghiChu:"V-Green đã khởi công 05/05 — coi như đã bàn giao" },
-  { ten:"Đấu nối tuyến ống thoát nước thải (HM VI) vào hố gom trạm XLNT", giao:"Trọng Tín", nhan:"V-Green", han:"trước 03/09/2026 (bắt đầu chạy thử)", trangThai:"risk", ghiChu:"HM VI kế hoạch xong 20/08/2026 — dự phòng chỉ 2 tuần, NT lũy kế HM VI hiện = 0" },
-  { ten:"Cấp điện thi công & điện vận hành trạm (HM X, XII)", giao:"Trọng Tín", nhan:"V-Green", han:"trước 03/09/2026", trangThai:"risk", ghiChu:"Đóng điện TBA kế hoạch 20/09 — SAU ngày V-Green cần điện chạy thử: xung đột tiến độ cần xử lý ngay" },
-  { ten:"Điểm xả sau xử lý ra hệ thống thoát nước mưa (HM V)", giao:"Trọng Tín", nhan:"V-Green", han:"trước 02/10/2026", trangThai:"watch", ghiChu:"Xác nhận vị trí cửa xả và cao độ" }
-];
+const giaoDien = window.SB_DATA.giaoDien;
 
-const vanBanData = [
-  { ngay:"27/12/2019", so:"XX_128_KH_UBND", gd:"Chuẩn bị đầu tư", donVi:"UBND Huyện", ten:"Kế hoạch Chương trình phát triển đô thị huyện Lạng Giang năm 2020", link:"https://drive.google.com/file/d/13HVvTiDnjOE2rvQs796qgD0ogdqpDngB/view?usp=drive_link" },
-  { ngay:"25/02/2022", so:"CV_801_CSPCCC&CNCH", gd:"Thiết kế", donVi:"CA PCCC Tỉnh", ten:"Công văn tham gia ý kiến giải pháp PCCC&CNCH (thiết kế cơ sở)", link:"https://drive.google.com/file/d/1-PQ5Zpx-C45fvTJZFGDGd9ie8jaQDg3v/view?usp=drive_link" },
-  { ngay:"26/02/2022", so:"QĐ_198_UBND", gd:"Chuẩn bị đầu tư", donVi:"UBND Tỉnh", ten:"Quyết định phê duyệt báo cáo đánh giá tác động môi trường", link:null },
-  { ngay:"07/07/2022", so:"CV_1811_SXD_PTĐT&HTKT", gd:"Thiết kế", donVi:"Sở Xây dựng", ten:"Công văn thông báo kết quả thẩm định Báo cáo nghiên cứu khả thi", link:null },
-  { ngay:"10/07/2022", so:"QĐ_100722_BH", gd:"Thiết kế", donVi:"Chủ đầu tư", ten:"Quyết định phê duyệt Báo cáo nghiên cứu khả thi", link:null },
-  { ngay:"27/09/2022", so:"XX_4436_TĐ_PCCC", gd:"Thiết kế", donVi:"Phòng CSPCCC CA Tỉnh", ten:"Văn bản thẩm duyệt PCCC", link:null },
-  { ngay:"31/12/2022", so:"QĐ_3257_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định thu hồi và phê duyệt phương án bồi thường GPMB (đợt 1)", link:null },
-  { ngay:"31/12/2022", so:"QĐ_3258_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định thu hồi và phê duyệt phương án bồi thường GPMB (đợt 1)", link:null },
-  { ngay:"29/06/2023", so:"QĐ_953_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định thu hồi và phê duyệt phương án bồi thường GPMB (đợt 2)", link:null },
-  { ngay:"29/06/2023", so:"QĐ_954_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định thu hồi và phê duyệt phương án bồi thường GPMB (đợt 2)", link:null },
-  { ngay:"18/09/2023", so:"QĐ_6480_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định cưỡng chế thu hồi đất", link:null },
-  { ngay:"08/03/2024", so:"QĐ_462_UBND", gd:"Chuẩn bị đầu tư", donVi:"UBND Huyện", ten:"Quyết định điều chỉnh quy hoạch chi tiết (lần 2)", link:null },
-  { ngay:"14/05/2024", so:"QĐ_1005_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định phê duyệt phương án bồi thường, hỗ trợ (đợt 3)", link:null },
-  { ngay:"29/05/2024", so:"QĐ_1087_UBND", gd:"Đất đai / GPMB", donVi:"UBND Huyện", ten:"Quyết định thu hồi đất (đợt 4)", link:null },
-  { ngay:"31/03/2025", so:"TB_425_SXD_PTĐT", gd:"Thiết kế", donVi:"Sở Xây dựng", ten:"Thông báo thẩm định điều chỉnh BCNCKT", link:null },
-  { ngay:"01/04/2025", so:"QĐ_014_BH", gd:"Thiết kế", donVi:"Chủ đầu tư", ten:"Quyết định phê duyệt điều chỉnh BCNCKT", link:null },
-  { ngay:"20/05/2025", so:"QĐ_538_UBND", gd:"Đất đai / GPMB", donVi:"UBND Tỉnh", ten:"Quyết định cho phép chuyển mục đích sử dụng đất", link:null },
-  { ngay:"23/05/2025", so:"QĐ_553_UBND", gd:"Đất đai / GPMB", donVi:"UBND Tỉnh", ten:"Quyết định giao đất", link:null },
-  { ngay:"02/06/2025", so:"XX_026_BCTTr_NPBG", gd:"Thiết kế", donVi:"Chủ đầu tư", ten:"Báo cáo thẩm tra thiết kế bản vẽ thi công – dự toán", link:null },
-  { ngay:"05/06/2025", so:"QĐ_056_QH_BH", gd:"Thiết kế", donVi:"Chủ đầu tư", ten:"Quyết định phê duyệt thiết kế bản vẽ thi công – dự toán", link:null },
-  { ngay:"23/06/2025", so:"XX_233_GPXD", gd:"Thi công", donVi:"UBND Huyện", ten:"Giấy phép xây dựng", link:null },
-  { ngay:"15/07/2025", so:"HĐ 1507/2025/HĐXD/BH-TT", gd:"Thi công", donVi:"Chủ đầu tư", ten:"Hợp đồng thi công xây dựng và lắp đặt thiết bị – Trọng Tín Group", link:null },
-  { ngay:"15/04/2026", so:"HĐ 68/2026/HĐKT/BH-VG", gd:"Thi công", donVi:"Chủ đầu tư", ten:"Hợp đồng thi công hệ thống XLNT 160 m³/ngđ – V-GREEN (kèm Phụ lục I giá trị HĐ)", link:null }
-];
+const vanBanData = window.SB_DATA.vanBanData;
 
 const missingDocs = [
   ["Phụ lục gia hạn tiến độ HĐ 1507 (mốc 31/08 → 30/10/2026)", "Rủi ro cao — ảnh hưởng quyền phạt chậm tiến độ và hiệu lực bảo lãnh"],
