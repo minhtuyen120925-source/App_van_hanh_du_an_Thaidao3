@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản trị người dùng — Dashboard Dự án Thái Đào 3</title>
+<style>
+  :root{--blue:#1e63b3;--navy:#0f2a4a;--bg:#f4f7fb;--line:#e2e8f0;--red:#dc2626;--green:#16a34a;--gray:#64748b;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:#1e293b;}
+  header{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;padding:16px 24px;}
+  header h1{font-size:18px;margin:0}
+  header a{color:#cfe0f5;font-size:13px;text-decoration:none;margin-right:14px}
+  header .btn-logout{background:#ffffff22;border:none;color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+  main{max-width:860px;margin:24px auto;padding:0 16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 8px rgba(15,42,74,.05)}
+  .card h2{font-size:15px;margin:0 0 14px;color:var(--navy)}
+  label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}
+  input,select{padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px}
+  input[type=email]{width:100%;max-width:320px}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+  button.primary{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer}
+  button.primary:disabled{opacity:.6;cursor:default}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--gray);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700}
+  .badge.admin{background:#eef2ff;color:#4338ca}
+  .badge.user{background:#f1f5f9;color:#475569}
+  .result{margin-top:14px;padding:14px;border-radius:8px;font-size:13.5px;display:none}
+  .result.ok{display:block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+  .result.err{display:block;background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+  .result code{background:#ffffffaa;padding:2px 6px;border-radius:5px}
+  .note{font-size:12.5px;color:var(--gray);margin-top:6px}
+  select.role-select{font-size:13px;padding:5px 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🔑 Quản trị người dùng</h1>
+  <div>
+    <a href="index.html">← Về Dashboard</a>
+    <span id="user-email" style="font-size:13px"></span>
+    <button class="btn-logout" id="btn-logout" style="margin-left:10px">Đăng xuất</button>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>➕ Tạo tài khoản mới</h2>
+    <form id="create-form">
+      <div class="row">
+        <div>
+          <label for="new-email">Email (Gmail của người dùng)</label>
+          <input type="email" id="new-email" required placeholder="ten@gmail.com">
+        </div>
+        <div>
+          <label for="new-role">Vai trò</label>
+          <select id="new-role">
+            <option value="user" selected>Người dùng (chỉ xem)</option>
+            <option value="admin">Admin (toàn quyền)</option>
+          </select>
+        </div>
+        <div>
+          <button type="submit" class="primary" id="btn-create">Tạo tài khoản</button>
+        </div>
+      </div>
+    </form>
+    <div class="result" id="create-result"></div>
+    <p class="note">Hệ thống sẽ tự đặt mật khẩu ngẫu nhiên. Mật khẩu chỉ hiện <b>1 lần duy nhất</b> ngay sau khi tạo — nhớ gửi cho người dùng ngay lúc đó.</p>
+  </div>
+
+  <div class="card">
+    <h2>👥 Danh sách người dùng</h2>
+    <table>
+      <thead><tr><th>Email</th><th>Vai trò</th><th>Ngày tạo</th></tr></thead>
+      <tbody id="user-tb"><tr><td colspan="3" class="note">Đang tải...</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script>
+(async function () {
+  const { data: sessionData } = await db.auth.getSession();
+  if (!sessionData.session) { window.location.replace('login.html'); return; }
+
+  const me = sessionData.session.user;
+  const { data: myProfile } = await db.from('profiles').select('role').eq('id', me.id).single();
+  if (myProfile?.role !== 'admin') {
+    alert('Trang này chỉ dành cho admin.');
+    window.location.replace('index.html');
+    return;
+  }
+
+  document.getElementById('user-email').textContent = me.email;
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    await db.auth.signOut();
+    window.location.replace('login.html');
+  });
+
+  async function loadUsers() {
+    const tb = document.getElementById('user-tb');
+    const { data, error } = await db.from('profiles').select('id, email, role, created_at').order('created_at', { ascending: true });
+    if (error) {
+      tb.innerHTML = `<tr><td colspan="3" class="note">Lỗi tải danh sách: ${error.message}</td></tr>`;
+      return;
+    }
+    tb.innerHTML = '';
+    data.forEach((u) => {
+      const tr = document.createElement('tr');
+      const ngay = new Date(u.created_at).toLocaleDateString('vi-VN');
+      const isMe = u.id === me.id;
+      tr.innerHTML = `
+        <td>${u.email ?? '(chưa có email)'}</td>
+        <td>${isMe
+          ? `<span class="badge ${u.role}">${u.role === 'admin' ? 'Admin' : 'Người dùng'}</span> <span class="note">(bạn)</span>`
+          : `<select class="role-select" data-id="${u.id}">
+               <option value="user" ${u.role === 'user' ? 'selected' : ''}>Người dùng</option>
+               <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+             </select>`}
+        </td>
+        <td>${ngay}</td>`;
+      tb.appendChild(tr);
+    });
+
+    tb.querySelectorAll('select.role-select').forEach((sel) => {
+      sel.addEventListener('change', async () => {
+        const id = sel.getAttribute('data-id');
+        const newRole = sel.value;
+        sel.disabled = true;
+        const { error } = await db.from('profiles').update({ role: newRole }).eq('id', id);
+        sel.disabled = false;
+        if (error) {
+          alert('Đổi quyền thất bại: ' + error.message);
+          loadUsers();
+        }
+      });
+    });
+  }
+
+  loadUsers();
+
+  const form = document.getElementById('create-form');
+  const btn = document.getElementById('btn-create');
+  const resultEl = document.getElementById('create-result');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultEl.className = 'result';
+    resultEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Đang tạo...';
+
+    const email = document.getElementById('new-email').value.trim();
+    const role = document.getElementById('new-role').value;
+
+    try {
+      const { data: { session } } = await db.auth.getSession();
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ email, role }),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        resultEl.className = 'result err';
+        resultEl.textContent = json.error || 'Tạo tài khoản thất bại.';
+      } else {
+        resultEl.className = 'result ok';
+        resultEl.innerHTML = `Đã tạo tài khoản <b>${json.email}</b> (${json.role === 'admin' ? 'Admin' : 'Người dùng'}).<br>Mật khẩu: <code>${json.password}</code> — gửi ngay cho người dùng, mật khẩu này sẽ không hiện lại.`;
+        document.getElementById('new-email').value = '';
+        loadUsers();
+      }
+    } catch (err) {
+      resultEl.className = 'result err';
+      resultEl.textContent = 'Lỗi kết nối: ' + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Tạo tài khoản';
+    }
+  });
+})();
+</script>
+</body>
+</html>

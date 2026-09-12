@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập — Dashboard Dự án Thái Đào 3</title>
+<style>
+  :root{--blue:#1e63b3;--navy:#0f2a4a;--bg:#f4f7fb;--line:#e2e8f0;--red:#dc2626;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .box{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(15,42,74,.10);padding:36px 32px;width:100%;max-width:380px;}
+  .box h1{font-size:18px;color:var(--navy);margin:0 0 4px;text-align:center;}
+  .box p.sub{font-size:13px;color:#64748b;text-align:center;margin:0 0 24px;}
+  label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:14px 0 6px;}
+  input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;}
+  input:focus{outline:2px solid var(--blue);outline-offset:1px;}
+  button{width:100%;margin-top:22px;padding:11px;border:none;border-radius:8px;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+  button:disabled{opacity:.6;cursor:default;}
+  .err{margin-top:14px;font-size:13px;color:var(--red);text-align:center;display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🏗️ DASHBOARD DỰ ÁN</h1>
+  <p class="sub">Khu đô thị số 3 Thái Đào — vui lòng đăng nhập</p>
+  <form id="login-form">
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" required placeholder="ten@gmail.com">
+    <label for="password">Mật khẩu</label>
+    <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+    <button type="submit" id="btn-submit">Đăng nhập</button>
+    <div class="err" id="err-msg"></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script>
+(async function () {
+  const { data } = await db.auth.getSession();
+  if (data.session) { window.location.replace('index.html'); return; }
+
+  const form = document.getElementById('login-form');
+  const btn = document.getElementById('btn-submit');
+  const errEl = document.getElementById('err-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Đang đăng nhập...';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { error } = await db.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errEl.textContent = 'Sai email hoặc mật khẩu. Vui lòng thử lại.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Đăng nhập';
+      return;
+    }
+    window.location.replace('index.html');
+  });
+})();
+</script>
+</body>
+</html>
