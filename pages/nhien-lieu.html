@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nhiên liệu (dầu diesel) — Xuất · Nhập · Tồn</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<link rel="stylesheet" href="../assets/css/dashboard.css">
+<style>
+  main{padding:18px 20px 40px}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:26px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .sec-h h2.sec{margin:0;padding:0;border:none}
+  .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .tscroll table{min-width:680px}
+  .tscroll th,.tscroll td{text-align:right;white-space:nowrap}
+  .tscroll th.l,.tscroll td.l{text-align:left}
+  .tscroll td.wrap{white-space:normal;min-width:140px}
+  .tscroll tbody tr.clickable{cursor:pointer}
+  .tscroll tfoot td{font-weight:800;background:#f1f5f9;border-top:2px solid var(--line)}
+  .empty{padding:22px;text-align:center;color:var(--gray);font-size:13px}
+  .cell-red{background:#fee2e2;color:#b91c1c;font-weight:800}
+  .cell-orange{background:#ffedd5;color:#c2410c;font-weight:800}
+  .small{font-size:11.5px;color:var(--gray);font-weight:600}
+  .banner{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px;background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+  .banner.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+  .btn.sm{padding:5px 11px;font-size:12px}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--sky)}
+  .btn.danger{background:var(--red)}
+  .btn.danger:hover{background:#b91c1c}
+  .ctrl label{font-size:12.5px;color:var(--gray);font-weight:600;display:flex;align-items:center;gap:6px}
+  .num-in{width:110px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;text-align:right}
+  .modal-back{position:fixed;inset:0;background:rgba(15,42,74,.55);display:none;align-items:flex-start;justify-content:center;padding:22px 12px;overflow:auto;z-index:50}
+  .modal-back.open{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:780px;width:100%;padding:20px 22px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .modal h3{font-size:17px;color:var(--navy);margin-bottom:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .modal .x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray);line-height:1}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 16px;font-size:13px;margin-bottom:14px}
+  .kv div{background:var(--sky);border-radius:8px;padding:7px 11px}
+  .kv b{display:block;font-size:11.5px;color:var(--gray);font-weight:600}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px;margin-bottom:14px}
+  .form-grid label{display:block;font-size:12.5px;font-weight:600;color:var(--gray)}
+  .form-grid input,.form-grid select{width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:inherit}
+  .form-grid .chk{display:flex;align-items:center;gap:8px;padding-top:22px;color:#1e293b}
+  .form-grid .chk input{width:auto;margin:0}
+  .form-grid .wide{grid-column:1/-1}
+  .photos{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0 14px}
+  .photos figure{margin:0;width:150px;font-size:11.5px;color:var(--gray);text-align:center}
+  .photos img{width:150px;height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block;background:#f1f5f9}
+  .photos .rm{margin-top:4px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .msg{font-size:13px;margin-top:10px}
+  .msg.err{color:var(--red)} .msg.ok{color:var(--green)}
+  @media(max-width:640px){main{padding:12px 10px 30px}.modal{padding:16px 14px}.chartbox{height:280px}}
+</style>
+</head>
+<body>
+<main>
+  <div id="status"></div>
+
+  <div id="content" hidden>
+    <div class="grid kpis" id="kpis"></div>
+
+    <div class="sec-h"><h2 class="sec">📊 Xuất – Nhập – Tồn theo tháng</h2></div>
+    <div class="card"><div class="chartbox"><canvas id="chart"></canvas></div><p class="note" id="chart-note"></p></div>
+
+    <div class="sec-h">
+      <h2 class="sec">📥 Phiếu nhập dầu</h2>
+      <div class="ctrl" style="margin:0">
+        <label>Tháng <select id="f-in-month"></select></label>
+      </div>
+    </div>
+    <div class="tscroll"><table id="tb-in"></table></div>
+
+    <div class="sec-h">
+      <h2 class="sec">📤 Phiếu xuất dầu cho máy</h2>
+      <div class="ctrl" style="margin:0">
+        <label>Tháng <select id="f-out-month"></select></label>
+        <label>Máy <select id="f-out-machine"></select></label>
+      </div>
+    </div>
+    <div class="tscroll"><table id="tb-out"></table></div>
+
+    <div class="sec-h"><h2 class="sec">🧮 Đối chiếu tiêu hao theo từng máy</h2></div>
+    <div class="tscroll"><table id="tb-sum"></table></div>
+    <p class="note" id="sum-note"></p>
+
+    <div class="sec-h"><h2 class="sec">🛢️ Tồn kho theo tháng (đối chiếu số đo thực tế)</h2></div>
+    <div class="tscroll"><table id="tb-stock"></table></div>
+    <p class="note">Tồn cuối kỳ lý thuyết = tồn đầu + nhập − xuất. Nếu tháng nào có số đo thực tế thì tháng sau lấy số đo đó làm tồn đầu. Ô cam = lệch quá ngưỡng cho phép.</p>
+
+    <div class="sec-h">
+      <h2 class="sec">🚜 Danh mục máy thi công</h2>
+      <button class="btn sm" id="btn-add-machine" hidden>➕ Thêm máy</button>
+    </div>
+    <div class="tscroll"><table id="tb-machines"></table></div>
+    <p class="note" id="machines-note"></p>
+  </div>
+</main>
+
+<div class="modal-back" id="modal-back"><div class="modal" id="modal"></div></div>
+
+<script src="../assets/js/nhien-lieu.js"></script>
+</body>
+</html>
