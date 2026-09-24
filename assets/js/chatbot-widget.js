@@ -119,11 +119,18 @@
     const typingEl = addTyping();
 
     try {
+      const { data: sessionData } = await db.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        throw new Error('Chưa đăng nhập');
+      }
+
       const res = await fetch(FUNCTION_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ question }),
       });
@@ -136,7 +143,10 @@
       }
     } catch (err) {
       typingEl.remove();
-      addBubble('Không kết nối được tới máy chủ. Kiểm tra lại mạng và thử lại nhé.', 'cb-error');
+      const msg = err && err.message === 'Chưa đăng nhập'
+        ? 'Phiên đăng nhập đã hết hạn, vui lòng tải lại trang và đăng nhập lại.'
+        : 'Không kết nối được tới máy chủ. Kiểm tra lại mạng và thử lại nhé.';
+      addBubble(msg, 'cb-error');
     } finally {
       input.disabled = false;
       sendBtn.disabled = false;

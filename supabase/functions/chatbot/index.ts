@@ -26,7 +26,7 @@ async function fetchProjectContext(supabase: any) {
 }
 
 export default {
-  fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     if (req.method !== 'POST') {
       return Response.json({ error: 'Chỉ hỗ trợ phương thức POST' }, { status: 405 })
     }
